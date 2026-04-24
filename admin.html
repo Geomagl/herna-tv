@@ -148,9 +148,9 @@
   <!-- PASTE + SCHEDULE -->
   <div class="section">
     <div class="section-title">Jména hráčů — vložit z Google Sheets</div>
-    <div class="paste-hint">Zkopíruj z Google Sheets dva sloupce (čas + jméno) a vlož sem pomocí Ctrl+V</div>
+    <div class="paste-hint">Zkopíruj jména ze Sheets (jeden sloupec) a vlož sem pomocí Ctrl+V — přiřadí se postupně k Match slotům</div>
     <div class="paste-zone">
-      <textarea id="paste-area" placeholder="Sem vlož data ze Sheets (Ctrl+V)&#10;Příklad:&#10;09:00 - 09:25	Filip&#10;09:25 - 09:28	Filip&#10;09:28 - 09:53	Tomáš"></textarea>
+      <textarea id="paste-area" placeholder="Sem vlož jména (Ctrl+V)&#10;Příklad:&#10;Filip&#10;Tomáš&#10;Abassi"></textarea>
     </div>
     <button class="btn btn-sm btn-dim" onclick="parsePaste()">Načíst jména ze Sheets</button>
 
@@ -280,36 +280,21 @@ function refreshNastupNames(){
   });
 }
 
-/* ── Parse paste from Sheets ── */
+/* ── Parse paste — jména pouze, jedno na řádek ── */
 function parsePaste(){
   const raw=document.getElementById("paste-area").value.trim();
-  if(!raw){alert("Nejdříve vlož data ze Sheets.");return;}
+  if(!raw){alert("Nejdříve vlož jména.");return;}
 
   const lines=raw.split("\n").map(l=>l.trim()).filter(Boolean);
-  // Each line: "HH:MM - HH:MM\tJméno"  or just "Jméno" per row
-  // Try to match time range + name
-  const timeRangeRe=/(\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})\s*\t(.+)/;
-  const nameOnlyRe=/^[^\d\t]+$/;
+  const hraSlots=slots.filter(s=>s.type==="hra");
 
-  let matched=0;
-  lines.forEach(line=>{
-    const m=line.match(timeRangeRe);
-    if(m){
-      const start=m[1].padStart(5,"0");
-      const name=m[3].trim();
-      // Find hra slot matching this start time
-      const slot=slots.find(s=>s.type==="hra"&&s.start===start);
-      if(slot){slot.name=name;matched++;}
-    }
+  lines.forEach((line,i)=>{
+    if(i<hraSlots.length) hraSlots[i].name=line;
   });
 
-  if(matched>0){
-    buildTable();
-    document.getElementById("paste-area").value="";
-    setStatus(`✓ Načteno ${matched} jmen z Google Sheets.`,"ok");
-  } else {
-    setStatus("Nepodařilo se načíst jména — zkontroluj formát dat ze Sheets.","error");
-  }
+  buildTable();
+  document.getElementById("paste-area").value="";
+  setStatus(`✓ Načteno ${Math.min(lines.length,hraSlots.length)} jmen.`,"ok");
 }
 
 // Also auto-parse on paste event
