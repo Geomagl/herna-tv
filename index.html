@@ -8,100 +8,52 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-    background: #000;
-    font-family: 'Inter', sans-serif;
-  }
-  #layout {
-    display: flex;
-    width: 100vw;
-    height: 100vh;
-  }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; }
+  #layout { display: flex; width: 100vw; height: 100vh; }
 
-  /* ── SIDEBAR ── */
   #sidebar {
-    width: 420px;
-    flex-shrink: 0;
-    background: #0a0a0a;
-    border-right: 1px solid #1a1a1a;
-    display: flex;
-    flex-direction: column;
-    padding: 32px 28px;
-    overflow: hidden;
-    color: #fff;
+    width: 420px; flex-shrink: 0; background: #0a0a0a;
+    border-right: 1px solid #1a1a1a; display: flex; flex-direction: column;
+    padding: 32px 28px; overflow: hidden; color: #fff;
   }
 
-  .clock-big { font-size: 64px; font-weight: 500; letter-spacing: 2px; line-height: 1; }
+  .clock-big  { font-size: 64px; font-weight: 500; letter-spacing: 2px; line-height: 1; }
   .date-label { font-size: 16px; color: #888; margin-top: 6px; margin-bottom: 28px; }
 
   .main-card {
-    border-radius: 18px;
-    padding: 28px 24px;
-    border: 2px solid transparent;
-    text-align: center;
-    transition: background 0.5s, border-color 0.5s;
-    margin-bottom: 24px;
+    border-radius: 18px; padding: 28px 24px; border: 2px solid transparent;
+    text-align: center; transition: background 0.5s, border-color 0.5s; margin-bottom: 24px;
   }
-  .phase-name { font-size: 44px; font-weight: 500; line-height: 1; margin-bottom: 12px; }
+  .phase-type { font-size: 13px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; opacity: 0.7; }
+  .phase-name { font-size: 44px; font-weight: 500; line-height: 1.1; margin-bottom: 12px; }
   .timer-val  { font-size: 88px; font-weight: 500; letter-spacing: -4px; line-height: 1; margin-bottom: 6px; }
   .timer-unit { font-size: 13px; color: #555; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; }
   .progress-bar-bg   { height: 8px; border-radius: 4px; background: #1a1a1a; overflow: hidden; }
   .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s linear, background 1s; }
 
   .section-label { font-size: 11px; color: #666; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
-
   .next-slots { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .next-slot  { border-radius: 12px; padding: 14px 16px; border: 1px solid #1c1c1c; display: flex; flex-direction: column; gap: 2px; }
+  .ns-label   { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; }
+  .ns-type    { font-size: 11px; opacity: 0.6; margin-bottom: 1px; }
+  .ns-name    { font-size: 22px; font-weight: 500; }
+  .ns-time    { font-size: 13px; }
+  .slot-dim   { opacity: 0.55; }
 
-  .next-slot {
-    border-radius: 12px;
-    padding: 14px 16px;
-    border: 1px solid #1c1c1c;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .ns-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; }
-  .ns-name  { font-size: 22px; font-weight: 500; }
-  .ns-time  { font-size: 13px; }
-
-  .slot-dim { opacity: 0.55; }
-
-  /* ── YOUTUBE AREA ── */
-  #yt-wrap {
-    flex: 1;
-    background: #000;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  #yt-wrap iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-  }
-  #no-stream {
-    color: #333;
-    font-size: 22px;
-    text-align: center;
-    line-height: 1.6;
-  }
+  #yt-wrap { flex: 1; background: #000; display: flex; align-items: center; justify-content: center; }
+  #yt-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+  #no-stream { color: #333; font-size: 22px; text-align: center; line-height: 1.6; }
   #no-stream span { display: block; font-size: 48px; margin-bottom: 16px; }
 </style>
 </head>
 <body>
-
 <div id="layout">
-
-  <!-- SIDEBAR -->
   <div id="sidebar">
     <div class="clock-big" id="clock">--:--</div>
     <div class="date-label" id="date-label"></div>
 
     <div class="main-card" id="main-card">
+      <div class="phase-type" id="phase-type"></div>
       <div class="phase-name" id="phase-name">—</div>
       <div class="timer-val"  id="timer-val">--:--</div>
       <div class="timer-unit">zbývá</div>
@@ -114,23 +66,25 @@
     <div class="next-slots">
       <div class="next-slot" id="next0">
         <div class="ns-label" id="next0-label">Následuje</div>
+        <div class="ns-type"  id="next0-type"></div>
         <div class="ns-name"  id="next0-name">—</div>
         <div class="ns-time"  id="next0-time"></div>
       </div>
       <div class="next-slot slot-dim" id="next1">
         <div class="ns-label" id="next1-label">Potom</div>
+        <div class="ns-type"  id="next1-type"></div>
         <div class="ns-name"  id="next1-name">—</div>
         <div class="ns-time"  id="next1-time"></div>
       </div>
       <div class="next-slot slot-dim" id="next2">
         <div class="ns-label" id="next2-label">A pak</div>
+        <div class="ns-type"  id="next2-type"></div>
         <div class="ns-name"  id="next2-name">—</div>
         <div class="ns-time"  id="next2-time"></div>
       </div>
     </div>
   </div>
 
-  <!-- YOUTUBE -->
   <div id="yt-wrap">
     <div id="no-stream">
       <span>📺</span>
@@ -138,55 +92,52 @@
       Přejdi do admin panelu a vlož odkaz.
     </div>
   </div>
-
 </div>
 
 <script>
-/* ══════════════════════════════════════════
-   KONFIGURACE — ZMĚŇ POUZE TOTO
-   ══════════════════════════════════════════ */
-const GITHUB_USER = "Geomagl";   // např. "johnsmith"
-const GITHUB_REPO = "herna-tv";               // název repozitáře
-const STREAM_FILE = "stream.json";            // soubor s YT linkem
-/* ════════════════════════════════════════ */
+const GITHUB_USER = "Geomagl";
+const GITHUB_REPO = "herna-tv";
 
-const schedule = [
-  {type:"nastup",start:"08:57",end:"09:00",label:"Nástup"},
-  {type:"hra",start:"09:00",end:"09:25",label:"Hra"},
-  {type:"nastup",start:"09:25",end:"09:28",label:"Nástup"},
-  {type:"hra",start:"09:28",end:"09:53",label:"Hra"},
-  {type:"nastup",start:"09:53",end:"09:56",label:"Nástup"},
-  {type:"hra",start:"09:56",end:"10:21",label:"Hra"},
-  {type:"nastup",start:"10:21",end:"10:24",label:"Nástup"},
-  {type:"hra",start:"10:24",end:"10:49",label:"Hra"},
-  {type:"nastup",start:"10:49",end:"10:52",label:"Nástup"},
-  {type:"hra",start:"10:52",end:"11:17",label:"Hra"},
-  {type:"nastup",start:"11:17",end:"11:20",label:"Nástup"},
-  {type:"hra",start:"11:20",end:"11:45",label:"Hra"},
-  {type:"nastup",start:"11:45",end:"11:48",label:"Nástup"},
-  {type:"hra",start:"11:48",end:"12:13",label:"Hra"},
-  {type:"nastup",start:"12:13",end:"12:16",label:"Nástup"},
-  {type:"hra",start:"12:16",end:"12:41",label:"Hra"},
-  {type:"pauza",start:"12:41",end:"12:53",label:"Technická pauza"},
-  {type:"nastup",start:"12:53",end:"12:56",label:"Nástup"},
-  {type:"hra",start:"12:56",end:"13:21",label:"Hra"},
-  {type:"nastup",start:"13:21",end:"13:24",label:"Nástup"},
-  {type:"hra",start:"13:24",end:"13:49",label:"Hra"},
-  {type:"nastup",start:"13:49",end:"13:52",label:"Nástup"},
-  {type:"hra",start:"13:52",end:"14:17",label:"Hra"},
-  {type:"nastup",start:"14:17",end:"14:20",label:"Nástup"},
-  {type:"hra",start:"14:20",end:"14:45",label:"Hra"},
-  {type:"nastup",start:"14:45",end:"14:48",label:"Nástup"},
-  {type:"hra",start:"14:48",end:"15:13",label:"Hra"},
-  {type:"nastup",start:"15:13",end:"15:16",label:"Nástup"},
-  {type:"hra",start:"15:16",end:"15:41",label:"Hra"},
-  {type:"nastup",start:"15:41",end:"15:44",label:"Nástup"},
-  {type:"hra",start:"15:44",end:"16:09",label:"Hra"},
-  {type:"nastup",start:"16:09",end:"16:12",label:"Nástup"},
-  {type:"hra",start:"16:12",end:"16:37",label:"Hra"},
-  {type:"nastup",start:"16:37",end:"16:40",label:"Nástup"},
-  {type:"hra",start:"16:40",end:"17:05",label:"Hra"},
+// Fallback schedule (used until schedule.json loads)
+let schedule = [
+  {type:"nastup",start:"08:57",end:"09:00",name:""},
+  {type:"hra",   start:"09:00",end:"09:25",name:""},
+  {type:"nastup",start:"09:25",end:"09:28",name:""},
+  {type:"hra",   start:"09:28",end:"09:53",name:""},
+  {type:"nastup",start:"09:53",end:"09:56",name:""},
+  {type:"hra",   start:"09:56",end:"10:21",name:""},
+  {type:"nastup",start:"10:21",end:"10:24",name:""},
+  {type:"hra",   start:"10:24",end:"10:49",name:""},
+  {type:"nastup",start:"10:49",end:"10:52",name:""},
+  {type:"hra",   start:"10:52",end:"11:17",name:""},
+  {type:"nastup",start:"11:17",end:"11:20",name:""},
+  {type:"hra",   start:"11:20",end:"11:45",name:""},
+  {type:"nastup",start:"11:45",end:"11:48",name:""},
+  {type:"hra",   start:"11:48",end:"12:13",name:""},
+  {type:"nastup",start:"12:13",end:"12:16",name:""},
+  {type:"hra",   start:"12:16",end:"12:41",name:""},
+  {type:"pauza", start:"12:41",end:"12:53",name:""},
+  {type:"nastup",start:"12:53",end:"12:56",name:""},
+  {type:"hra",   start:"12:56",end:"13:21",name:""},
+  {type:"nastup",start:"13:21",end:"13:24",name:""},
+  {type:"hra",   start:"13:24",end:"13:49",name:""},
+  {type:"nastup",start:"13:49",end:"13:52",name:""},
+  {type:"hra",   start:"13:52",end:"14:17",name:""},
+  {type:"nastup",start:"14:17",end:"14:20",name:""},
+  {type:"hra",   start:"14:20",end:"14:45",name:""},
+  {type:"nastup",start:"14:45",end:"14:48",name:""},
+  {type:"hra",   start:"14:48",end:"15:13",name:""},
+  {type:"nastup",start:"15:13",end:"15:16",name:""},
+  {type:"hra",   start:"15:16",end:"15:41",name:""},
+  {type:"nastup",start:"15:41",end:"15:44",name:""},
+  {type:"hra",   start:"15:44",end:"16:09",name:""},
+  {type:"nastup",start:"16:09",end:"16:12",name:""},
+  {type:"hra",   start:"16:12",end:"16:37",name:""},
+  {type:"nastup",start:"16:37",end:"16:40",name:""},
+  {type:"hra",   start:"16:40",end:"17:05",name:""},
 ];
+
+let labels = {hra:"Match",nastup:"Warm-up",pauza:"Break",konec:"Session complete"};
 
 const colors = {
   hra:   {bg:"#071a04",border:"#a3e635",text:"#a3e635",fill:"#a3e635"},
@@ -203,6 +154,14 @@ function toSec(t){const[h,m]=t.split(":").map(Number);return h*3600+m*60;}
 function nowSec(){const n=new Date();return n.getHours()*3600+n.getMinutes()*60+n.getSeconds();}
 function pad(n){return String(n).padStart(2,"0");}
 
+function slotDisplayName(slot){
+  const base = slot.type==="hra" ? labels.hra : slot.type==="nastup" ? labels.nastup : labels.pauza;
+  return slot.name ? slot.name : base;
+}
+function slotTypeName(slot){
+  return slot.type==="hra" ? labels.hra : slot.type==="nastup" ? labels.nastup : labels.pauza;
+}
+
 function getColor(slot,secsLeft,totalSecs){
   if(slot.type==="nastup"){
     const ratio=secsLeft/totalSecs;
@@ -218,23 +177,33 @@ function getColor(slot,secsLeft,totalSecs){
 
 function setNextSlot(i,slot,bright){
   const el=document.getElementById("next"+i);
+  const tp=document.getElementById("next"+i+"-type");
   const nm=document.getElementById("next"+i+"-name");
   const tm=document.getElementById("next"+i+"-time");
   const lb=document.getElementById("next"+i+"-label");
   if(slot){
+    const hasName = slot.name && slot.name.trim();
     if(bright){
       const c=colors[slot.type]||colors.pauza;
-      el.style.background=c.bg;el.style.borderColor=c.border;
-      nm.style.color=c.text;lb.style.color=c.text;tm.style.color="#999";
+      el.style.background=c.bg; el.style.borderColor=c.border;
+      nm.style.color=c.text; lb.style.color=c.text; tm.style.color="#999"; tp.style.color=c.text;
     } else {
       const c=dimColors[slot.type]||dimColors.pauza;
-      el.style.background=c.bg;el.style.borderColor=c.border;
-      nm.style.color=c.text;lb.style.color=c.labelColor;tm.style.color=c.timeColor;
+      el.style.background=c.bg; el.style.borderColor=c.border;
+      nm.style.color=c.text; lb.style.color=c.labelColor; tm.style.color=c.timeColor; tp.style.color=c.labelColor;
     }
-    nm.textContent=slot.label;tm.textContent=slot.start+" – "+slot.end;
+    // If slot has a name, show type small + name big; otherwise just type big
+    if(hasName){
+      tp.textContent=slotTypeName(slot);
+      nm.textContent=slot.name;
+    } else {
+      tp.textContent="";
+      nm.textContent=slotTypeName(slot);
+    }
+    tm.textContent=slot.start+" – "+slot.end;
   } else {
-    el.style.background="#0d0d0d";el.style.borderColor="#141414";
-    nm.style.color="#333";nm.textContent="—";tm.textContent="";lb.style.color="#333";
+    el.style.background="#0d0d0d"; el.style.borderColor="#141414";
+    nm.style.color="#333"; nm.textContent="—"; tm.textContent=""; lb.style.color="#333"; tp.textContent="";
   }
 }
 
@@ -252,6 +221,7 @@ function tick(){
   }
 
   const card=document.getElementById("main-card");
+  const pType=document.getElementById("phase-type");
   const pName=document.getElementById("phase-name");
   const timerVal=document.getElementById("timer-val");
   const progFill=document.getElementById("progress-fill");
@@ -263,19 +233,28 @@ function tick(){
     const totalSecs=endS-startS,secsLeft=endS-ns;
     const pct=Math.min(100,((ns-startS)/totalSecs)*100);
     const c=getColor(slot,secsLeft,totalSecs);
-    card.style.background=c.bg;card.style.borderColor=c.border;
-    pName.style.color=c.text;pName.textContent=slot.label;
+    card.style.background=c.bg; card.style.borderColor=c.border;
+    pType.style.color=c.text;
+    pName.style.color=c.text;
+    const hasName=slot.name&&slot.name.trim();
+    if(hasName){
+      pType.textContent=slotTypeName(slot);
+      pName.textContent=slot.name;
+    } else {
+      pType.textContent="";
+      pName.textContent=slotTypeName(slot);
+    }
     timerVal.style.color="#fff";
     timerVal.textContent=pad(Math.floor(secsLeft/60))+":"+pad(secsLeft%60);
-    progFill.style.width=pct+"%";progFill.style.background=c.fill;
+    progFill.style.width=pct+"%"; progFill.style.background=c.fill;
   } else if(ns<toSec(schedule[0].start)){
-    card.style.background="#0d0d0d";card.style.borderColor="#1c1c1c";
-    pName.style.color="#555";pName.textContent="Brzy začínáme";
-    timerVal.style.color="#555";timerVal.textContent="--:--";progFill.style.width="0%";
+    card.style.background="#0d0d0d"; card.style.borderColor="#1c1c1c";
+    pType.textContent=""; pName.style.color="#555"; pName.textContent="Brzy začínáme";
+    timerVal.style.color="#555"; timerVal.textContent="--:--"; progFill.style.width="0%";
   } else {
-    card.style.background="#0d0d0d";card.style.borderColor="#1c1c1c";
-    pName.style.color="#555";pName.textContent=labels.konec;
-    timerVal.style.color="#555";timerVal.textContent="00:00";progFill.style.width="100%";
+    card.style.background="#0d0d0d"; card.style.borderColor="#1c1c1c";
+    pType.textContent=""; pName.style.color="#555"; pName.textContent=labels.konec;
+    timerVal.style.color="#555"; timerVal.textContent="00:00"; progFill.style.width="100%";
   }
 
   setNextSlot(0,schedule[nextStart]||null,true);
@@ -283,66 +262,51 @@ function tick(){
   setNextSlot(2,schedule[nextStart+2]||null,false);
 }
 
-/* ── Labels loader ── */
-let labels={hra:"Hra",nastup:"Nástup",pauza:"Technická pauza",konec:"Rozvrh dokončen"};
-
-function applyLabels(){
-  schedule.forEach(s=>{
-    if(s.type==="hra")    s.label=labels.hra;
-    if(s.type==="nastup") s.label=labels.nastup;
-    if(s.type==="pauza")  s.label=labels.pauza;
-  });
-}
-
-function loadLabels(){
-  fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/labels.json?nocache=${Date.now()}`)
-    .then(r=>r.json())
-    .then(d=>{
-      labels={
-        hra:    d.hra    || "Hra",
-        nastup: d.nastup || "Nástup",
-        pauza:  d.pauza  || "Technická pauza",
-        konec:  d.konec  || "Rozvrh dokončen",
-      };
-      applyLabels();
-    })
-    .catch(()=>{});
-}
-
-/* ── YouTube loader ── */
 function extractVideoId(url){
-  if(!url) return null;
-  const patterns=[
+  const p=[
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
     /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
   ];
-  for(const p of patterns){const m=url.match(p);if(m)return m[1];}
+  for(const r of p){const m=(url||"").match(r);if(m)return m[1];}
   return null;
 }
 
 let currentVideoId=null;
 
-function loadStream(){
-  const url=`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${STREAM_FILE}?nocache=${Date.now()}`;
-  fetch(url)
-    .then(r=>r.json())
-    .then(data=>{
-      const vid=extractVideoId(data.url||"");
-      if(vid && vid!==currentVideoId){
+function loadAll(){
+  const nc=Date.now();
+  const base=`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main`;
+
+  fetch(`${base}/stream.json?nocache=${nc}`)
+    .then(r=>r.json()).then(d=>{
+      const vid=extractVideoId(d.url||"");
+      if(vid&&vid!==currentVideoId){
         currentVideoId=vid;
         const wrap=document.getElementById("yt-wrap");
         wrap.innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&mute=1&controls=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
       }
-    })
-    .catch(()=>{/* stream.json neexistuje nebo chyba — ponecháme placeholder */});
+    }).catch(()=>{});
+
+  fetch(`${base}/labels.json?nocache=${nc}`)
+    .then(r=>r.json()).then(d=>{
+      labels={
+        hra:    d.hra    ||"Match",
+        nastup: d.nastup ||"Warm-up",
+        pauza:  d.pauza  ||"Break",
+        konec:  d.konec  ||"Session complete",
+      };
+    }).catch(()=>{});
+
+  fetch(`${base}/schedule.json?nocache=${nc}`)
+    .then(r=>r.json()).then(d=>{
+      if(Array.isArray(d)&&d.length>0) schedule=d;
+    }).catch(()=>{});
 }
 
 tick();
 setInterval(tick,1000);
-loadLabels();
-loadStream();
-setInterval(loadStream,60000);
-setInterval(loadLabels,60000);
+loadAll();
+setInterval(loadAll,60000);
 document.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
 </script>
 </body>
