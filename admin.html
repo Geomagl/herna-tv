@@ -350,7 +350,10 @@ async function saveAll(){
     return {type:slot.type, start:slot.start, end:slot.end, name};
   });
 
-  const [ok1,ok2,ok3]=await Promise.all([
+  const ok1=await ghPut("stream.json",   JSON.stringify({url, updated:new Date().toISOString()}), token,"Update stream");
+  const ok2=await ghPut("labels.json",   JSON.stringify(labels),                                   token,"Update labels");
+  const ok3=await ghPut("schedule.json", JSON.stringify(scheduleOut),                              token,"Update schedule");
+  if(false&&[
     ghPut("stream.json",   JSON.stringify({url, updated:new Date().toISOString()}),   token,"Update stream"),
     ghPut("labels.json",   JSON.stringify(labels),                                     token,"Update labels"),
     ghPut("schedule.json", JSON.stringify(scheduleOut),                                token,"Update schedule"),
