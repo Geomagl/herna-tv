@@ -145,7 +145,7 @@
 /* ══════════════════════════════════════════
    KONFIGURACE — ZMĚŇ POUZE TOTO
    ══════════════════════════════════════════ */
-const GITHUB_USER = "Geomagl";   // např. "johnsmith"
+const GITHUB_USER = "TVUJ_GITHUB_USERNAME";   // např. "johnsmith"
 const GITHUB_REPO = "herna-tv";               // název repozitáře
 const STREAM_FILE = "stream.json";            // soubor s YT linkem
 /* ════════════════════════════════════════ */
@@ -274,13 +274,39 @@ function tick(){
     timerVal.style.color="#555";timerVal.textContent="--:--";progFill.style.width="0%";
   } else {
     card.style.background="#0d0d0d";card.style.borderColor="#1c1c1c";
-    pName.style.color="#555";pName.textContent="Rozvrh dokončen";
+    pName.style.color="#555";pName.textContent=labels.konec;
     timerVal.style.color="#555";timerVal.textContent="00:00";progFill.style.width="100%";
   }
 
   setNextSlot(0,schedule[nextStart]||null,true);
   setNextSlot(1,schedule[nextStart+1]||null,false);
   setNextSlot(2,schedule[nextStart+2]||null,false);
+}
+
+/* ── Labels loader ── */
+let labels={hra:"Hra",nastup:"Nástup",pauza:"Technická pauza",konec:"Rozvrh dokončen"};
+
+function applyLabels(){
+  schedule.forEach(s=>{
+    if(s.type==="hra")    s.label=labels.hra;
+    if(s.type==="nastup") s.label=labels.nastup;
+    if(s.type==="pauza")  s.label=labels.pauza;
+  });
+}
+
+function loadLabels(){
+  fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/labels.json?nocache=${Date.now()}`)
+    .then(r=>r.json())
+    .then(d=>{
+      labels={
+        hra:    d.hra    || "Hra",
+        nastup: d.nastup || "Nástup",
+        pauza:  d.pauza  || "Technická pauza",
+        konec:  d.konec  || "Rozvrh dokončen",
+      };
+      applyLabels();
+    })
+    .catch(()=>{});
 }
 
 /* ── YouTube loader ── */
@@ -305,7 +331,7 @@ function loadStream(){
       if(vid && vid!==currentVideoId){
         currentVideoId=vid;
         const wrap=document.getElementById("yt-wrap");
-        wrap.innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&mute=1&controls=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        wrap.innerHTML=`<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&mute=0&controls=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
       }
     })
     .catch(()=>{/* stream.json neexistuje nebo chyba — ponecháme placeholder */});
@@ -313,8 +339,10 @@ function loadStream(){
 
 tick();
 setInterval(tick,1000);
+loadLabels();
 loadStream();
-setInterval(loadStream,60000); // refresh každých 60s
+setInterval(loadStream,60000);
+setInterval(loadLabels,60000);
 document.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
 </script>
 </body>
