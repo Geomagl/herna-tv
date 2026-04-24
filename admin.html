@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Herna TV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    min-height: 100%;
+    background: #0a0a0a;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 20px;
+    padding: 48px 44px;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .logo {
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 36px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 20px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: #555; }
+
+  .btn {
+    width: 100%;
+    background: #a3e635;
+    color: #0a0a0a;
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .btn:hover  { background: #bef264; }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; transform: none; }
+
+  .status {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    display: none;
+  }
+  .status.ok    { background: #071a04; border: 1px solid #a3e635; color: #a3e635; display: block; }
+  .status.error { background: #1f0000; border: 1px solid #ff4444; color: #ff6666; display: block; }
+  .status.loading { background: #111; border: 1px solid #333; color: #888; display: block; }
+
+  .current {
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid #1c1c1c;
+  }
+  .current-label { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 8px; }
+  .current-url   { font-size: 14px; color: #666; word-break: break-all; min-height: 20px; }
+
+  .preview-thumb {
+    margin-top: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: none;
+  }
+  .preview-thumb img { width: 100%; display: block; }
+
+  .help {
+    margin-top: 32px;
+    padding: 16px;
+    background: #0d0d0d;
+    border-radius: 10px;
+    border: 1px solid #1c1c1c;
+  }
+  .help-title { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 10px; }
+  .help p { font-size: 13px; color: #555; line-height: 1.7; }
+  .help code { background: #1a1a1a; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #888; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">Herna TV</div>
+  <h1>Admin panel</h1>
+
+  <label for="token">GitHub Personal Access Token</label>
+  <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+
+  <label for="yturl">YouTube Live odkaz</label>
+  <input type="text"     id="yturl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+
+  <button class="btn" id="save-btn" onclick="saveStream()">Uložit a spustit na TV</button>
+
+  <div class="status" id="status"></div>
+
+  <div class="current">
+    <div class="current-label">Aktuálně nastavený stream</div>
+    <div class="current-url" id="current-url">Načítám...</div>
+    <div class="preview-thumb" id="preview-thumb">
+      <img id="preview-img" src="" alt="náhled">
+    </div>
+  </div>
+
+  <div class="help">
+    <div class="help-title">Jak získat token?</div>
+    <p>
+      GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) →
+      Generate new token → zaškrtni <code>repo</code> → Generate.<br><br>
+      Token začíná <code>ghp_</code> — ulož si ho, zobrazí se jen jednou.
+    </p>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   KONFIGURACE — ZMĚŇ POUZE TOTO
+   ══════════════════════════════════════════ */
+const GITHUB_USER = "TVUJ_GITHUB_USERNAME";
+const GITHUB_REPO = "herna-tv";
+const STREAM_FILE = "stream.json";
+/* ════════════════════════════════════════ */
+
+function extractVideoId(url){
+  const patterns=[
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+  ];
+  for(const p of patterns){const m=(url||"").match(p);if(m)return m[1];}
+  return null;
+}
+
+function setStatus(msg, type){
+  const el=document.getElementById("status");
+  el.textContent=msg;
+  el.className="status "+type;
+}
+
+async function saveStream(){
+  const token=document.getElementById("token").value.trim();
+  const url=document.getElementById("yturl").value.trim();
+  const btn=document.getElementById("save-btn");
+
+  if(!token){ setStatus("Zadej GitHub token.", "error"); return; }
+  if(!url)  { setStatus("Zadej YouTube odkaz.", "error"); return; }
+  if(!extractVideoId(url)){ setStatus("Odkaz nevypadá jako platný YouTube link.", "error"); return; }
+
+  btn.disabled=true;
+  setStatus("Ukládám...", "loading");
+
+  const content=btoa(JSON.stringify({url, updated: new Date().toISOString()}));
+  const apiUrl=`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${STREAM_FILE}`;
+
+  try {
+    // Zjistíme SHA pokud soubor existuje (potřebné pro update)
+    let sha=null;
+    const getRes=await fetch(apiUrl,{headers:{"Authorization":"token "+token,"Accept":"application/vnd.github+json"}});
+    if(getRes.ok){const d=await getRes.json();sha=d.sha;}
+
+    const body={message:"Update stream link",content};
+    if(sha) body.sha=sha;
+
+    const putRes=await fetch(apiUrl,{
+      method:"PUT",
+      headers:{"Authorization":"token "+token,"Accept":"application/vnd.github+json","Content-Type":"application/json"},
+      body:JSON.stringify(body)
+    });
+
+    if(putRes.ok){
+      setStatus("✓ Uloženo! TV se aktualizuje do 60 sekund.", "ok");
+      localStorage.setItem("gh_token", token);
+      loadCurrent();
+    } else {
+      const err=await putRes.json();
+      setStatus("Chyba: "+(err.message||putRes.status), "error");
+    }
+  } catch(e){
+    setStatus("Chyba připojení: "+e.message, "error");
+  }
+
+  btn.disabled=false;
+}
+
+async function loadCurrent(){
+  const el=document.getElementById("current-url");
+  const thumb=document.getElementById("preview-thumb");
+  const img=document.getElementById("preview-img");
+  try {
+    const res=await fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${STREAM_FILE}?nocache=${Date.now()}`);
+    if(!res.ok){el.textContent="Žádný stream není nastaven.";return;}
+    const data=await res.json();
+    el.textContent=data.url||"—";
+    const vid=extractVideoId(data.url||"");
+    if(vid){
+      img.src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
+      thumb.style.display="block";
+    }
+  } catch(e){
+    el.textContent="Nepodařilo se načíst.";
+  }
+}
+
+// Předvyplnění uloženého tokenu
+const saved=localStorage.getItem("gh_token");
+if(saved) document.getElementById("token").value=saved;
+
+// Náhled thumbnailu při psaní
+document.getElementById("yturl").addEventListener("input", function(){
+  const vid=extractVideoId(this.value);
+  const thumb=document.getElementById("preview-thumb");
+  const img=document.getElementById("preview-img");
+  if(vid){
+    img.src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
+    thumb.style.display="block";
+  } else {
+    thumb.style.display="none";
+  }
+});
+
+loadCurrent();
+</script>
+</body>
+</html>
