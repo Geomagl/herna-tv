@@ -8,179 +8,224 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
-    min-height: 100%;
-    background: #0a0a0a;
-    font-family: 'Inter', sans-serif;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-  .card {
+  html, body { min-height: 100%; background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; padding: 24px; }
+
+  .page { max-width: 860px; margin: 0 auto; }
+
+  .logo { font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #555; margin-bottom: 8px; }
+  h1   { font-size: 28px; font-weight: 500; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: #555; margin-bottom: 36px; }
+
+  .section {
     background: #111;
     border: 1px solid #222;
-    border-radius: 20px;
-    padding: 48px 44px;
-    width: 100%;
-    max-width: 560px;
-  }
-  .logo { font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #555; margin-bottom: 8px; }
-  h1   { font-size: 28px; font-weight: 500; color: #fff; margin-bottom: 36px; }
-  h2   { font-size: 16px; font-weight: 500; color: #aaa; margin-bottom: 20px; margin-top: 36px; padding-top: 36px; border-top: 1px solid #1c1c1c; }
-
-  label {
-    display: block;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #666;
-    margin-bottom: 8px;
-  }
-  input[type="text"], input[type="password"] {
-    width: 100%;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 10px;
-    padding: 14px 16px;
-    font-size: 15px;
-    color: #fff;
-    font-family: 'Inter', sans-serif;
+    border-radius: 16px;
+    padding: 28px 32px;
     margin-bottom: 20px;
-    outline: none;
-    transition: border-color 0.2s;
   }
-  input:focus { border-color: #555; }
-
-  .label-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .label-row .field { display: flex; flex-direction: column; }
-  .label-row input  { margin-bottom: 0; }
-
-  .badge {
-    display: inline-block;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    font-weight: 500;
-    width: fit-content;
+  .section-title {
+    font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+    color: #666; margin-bottom: 20px;
   }
-  .badge-hra    { background: #071a04; color: #a3e635; border: 1px solid #a3e635; }
-  .badge-nastup { background: #1f1200; color: #ff9800; border: 1px solid #ff9800; }
-  .badge-pauza  { background: #0d0d1f; color: #7c7cff; border: 1px solid #7c7cff; }
-  .badge-konec  { background: #1a1a1a; color: #888;    border: 1px solid #444; }
+
+  label { display: block; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #666; margin-bottom: 8px; }
+
+  input[type="text"], input[type="password"], input[type="time"] {
+    background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px;
+    padding: 12px 14px; font-size: 14px; color: #fff;
+    font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s;
+  }
+  input[type="text"]:focus, input[type="password"]:focus, input[type="time"]:focus { border-color: #555; }
+  input[type="time"] { width: 110px; }
+
+  .full-input { width: 100%; margin-bottom: 16px; }
 
   .btn {
-    width: 100%;
-    background: #a3e635;
-    color: #0a0a0a;
-    border: none;
-    border-radius: 10px;
-    padding: 16px;
-    font-size: 16px;
-    font-weight: 500;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    margin-top: 4px;
+    background: #a3e635; color: #0a0a0a; border: none; border-radius: 10px;
+    padding: 14px 24px; font-size: 15px; font-weight: 500;
+    font-family: 'Inter', sans-serif; cursor: pointer; transition: background 0.2s, transform 0.1s;
   }
   .btn:hover   { background: #bef264; }
   .btn:active  { transform: scale(0.98); }
   .btn:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; transform: none; }
+  .btn-full { width: 100%; padding: 16px; font-size: 16px; }
+  .btn-sm { padding: 8px 16px; font-size: 13px; }
+  .btn-dim { background: #1a1a1a; color: #aaa; border: 1px solid #2a2a2a; }
+  .btn-dim:hover { background: #222; color: #fff; }
 
-  .status {
-    margin-top: 20px;
-    padding: 14px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    display: none;
-  }
+  .status { margin-top: 16px; padding: 12px 16px; border-radius: 10px; font-size: 14px; display: none; }
   .status.ok      { background: #071a04; border: 1px solid #a3e635; color: #a3e635; display: block; }
   .status.error   { background: #1f0000; border: 1px solid #ff4444; color: #ff6666; display: block; }
   .status.loading { background: #111;    border: 1px solid #333;    color: #888;    display: block; }
 
-  .current { margin-top: 28px; padding-top: 28px; border-top: 1px solid #1c1c1c; }
-  .current-label { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 8px; }
-  .current-url   { font-size: 14px; color: #666; word-break: break-all; min-height: 20px; }
-  .preview-thumb { margin-top: 16px; border-radius: 8px; overflow: hidden; display: none; }
-  .preview-thumb img { width: 100%; display: block; }
+  /* Paste zone */
+  .paste-zone {
+    background: #0d0d0d; border: 2px dashed #2a2a2a; border-radius: 12px;
+    padding: 20px; margin-bottom: 16px; cursor: text;
+    transition: border-color 0.2s;
+  }
+  .paste-zone:focus-within { border-color: #555; }
+  .paste-zone textarea {
+    width: 100%; background: transparent; border: none; outline: none;
+    color: #888; font-family: 'Inter', sans-serif; font-size: 13px;
+    resize: none; min-height: 80px;
+  }
+  .paste-hint { font-size: 12px; color: #444; margin-bottom: 8px; letter-spacing: 1px; }
 
-  .help { margin-top: 32px; padding: 16px; background: #0d0d0d; border-radius: 10px; border: 1px solid #1c1c1c; }
-  .help-title { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 10px; }
-  .help p { font-size: 13px; color: #555; line-height: 1.7; }
-  .help code { background: #1a1a1a; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #888; }
+  /* Schedule table */
+  .sched-table { width: 100%; border-collapse: collapse; }
+  .sched-table th {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: #444; padding: 0 8px 12px 8px; text-align: left;
+  }
+  .sched-row { border-top: 1px solid #1a1a1a; }
+  .sched-row td { padding: 8px; vertical-align: middle; }
+
+  .type-badge {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 6px; font-weight: 500; white-space: nowrap;
+  }
+  .badge-hra    { background: #071a04; color: #a3e635; border: 1px solid #2a4a10; }
+  .badge-nastup { background: #1f1200; color: #ff9800; border: 1px solid #4d2e00; }
+  .badge-pauza  { background: #0d0d1f; color: #7c7cff; border: 1px solid #2a2a5a; }
+
+  .time-inputs { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #555; }
+  .name-input  { background: #1a1a1a; border: 1px solid #222; border-radius: 6px; padding: 8px 10px; font-size: 14px; color: #fff; font-family: 'Inter', sans-serif; outline: none; width: 140px; }
+  .name-input:focus { border-color: #555; }
+  .name-input.nastup-auto { color: #666; font-style: italic; }
+
+  /* Labels grid */
+  .labels-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .label-field { display: flex; flex-direction: column; gap: 8px; }
+  .label-field input { margin-bottom: 0; }
+
+  /* Stream preview */
+  .preview-thumb { margin-top: 12px; border-radius: 8px; overflow: hidden; display: none; max-width: 320px; }
+  .preview-thumb img { width: 100%; display: block; }
+  .current-url { font-size: 13px; color: #555; word-break: break-all; margin-top: 8px; }
 </style>
 </head>
 <body>
-<div class="card">
+<div class="page">
   <div class="logo">Herna TV</div>
   <h1>Admin panel</h1>
+  <p class="subtitle">Nastav stream, jména hráčů a časy pro dnešní den.</p>
 
-  <label for="token">GitHub Personal Access Token</label>
-  <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
-
-  <label for="yturl">YouTube Live odkaz</label>
-  <input type="text" id="yturl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
-
-  <h2>Názvy na TV</h2>
-
-  <div class="label-row">
-    <div class="field">
-      <span class="badge badge-hra">Hra</span>
-      <input type="text" id="label-hra" placeholder="Hra">
-    </div>
-    <div class="field">
-      <span class="badge badge-nastup">Nástup</span>
-      <input type="text" id="label-nastup" placeholder="Nástup">
-    </div>
-  </div>
-  <div class="label-row">
-    <div class="field">
-      <span class="badge badge-pauza">Technická pauza</span>
-      <input type="text" id="label-pauza" placeholder="Technická pauza">
-    </div>
-    <div class="field">
-      <span class="badge badge-konec">Konec</span>
-      <input type="text" id="label-konec" placeholder="Rozvrh dokončen">
-    </div>
+  <!-- TOKEN + STREAM -->
+  <div class="section">
+    <div class="section-title">Přístup &amp; Stream</div>
+    <label>GitHub Token</label>
+    <input type="password" id="token" class="full-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+    <label>YouTube Live odkaz</label>
+    <input type="text" id="yturl" class="full-input" placeholder="https://www.youtube.com/watch?v=...">
+    <div class="preview-thumb" id="preview-thumb"><img id="preview-img" src="" alt="náhled"></div>
+    <div class="current-url" id="current-url"></div>
   </div>
 
-  <button class="btn" id="save-btn" onclick="saveAll()">Uložit vše a spustit na TV</button>
+  <!-- LABELS -->
+  <div class="section">
+    <div class="section-title">Názvy na TV</div>
+    <div class="labels-grid">
+      <div class="label-field">
+        <span class="type-badge badge-hra" style="width:fit-content">Hra</span>
+        <input type="text" id="label-hra" placeholder="Match">
+      </div>
+      <div class="label-field">
+        <span class="type-badge badge-nastup" style="width:fit-content">Nástup</span>
+        <input type="text" id="label-nastup" placeholder="Warm-up">
+      </div>
+      <div class="label-field">
+        <span class="type-badge badge-pauza" style="width:fit-content">Přestávka</span>
+        <input type="text" id="label-pauza" placeholder="Break">
+      </div>
+      <div class="label-field">
+        <span class="type-badge" style="background:#1a1a1a;color:#888;border:1px solid #333;width:fit-content">Konec</span>
+        <input type="text" id="label-konec" placeholder="Session complete">
+      </div>
+    </div>
+  </div>
+
+  <!-- PASTE + SCHEDULE -->
+  <div class="section">
+    <div class="section-title">Jména hráčů — vložit z Google Sheets</div>
+    <div class="paste-hint">Zkopíruj z Google Sheets dva sloupce (čas + jméno) a vlož sem pomocí Ctrl+V</div>
+    <div class="paste-zone">
+      <textarea id="paste-area" placeholder="Sem vlož data ze Sheets (Ctrl+V)&#10;Příklad:&#10;09:00 - 09:25	Filip&#10;09:25 - 09:28	Filip&#10;09:28 - 09:53	Tomáš"></textarea>
+    </div>
+    <button class="btn btn-sm btn-dim" onclick="parsePaste()">Načíst jména ze Sheets</button>
+
+    <div style="margin-top: 24px;">
+      <table class="sched-table">
+        <thead>
+          <tr>
+            <th>Typ</th>
+            <th>Začátek</th>
+            <th>Konec</th>
+            <th>Jméno hráče</th>
+          </tr>
+        </thead>
+        <tbody id="sched-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SAVE -->
+  <button class="btn btn-full" id="save-btn" onclick="saveAll()">Uložit vše a spustit na TV</button>
   <div class="status" id="status"></div>
-
-  <div class="current">
-    <div class="current-label">Aktuálně nastavený stream</div>
-    <div class="current-url" id="current-url">Načítám...</div>
-    <div class="preview-thumb" id="preview-thumb">
-      <img id="preview-img" src="" alt="náhled">
-    </div>
-  </div>
-
-  <div class="help">
-    <div class="help-title">Jak získat token?</div>
-    <p>
-      GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) →
-      Generate new token → zaškrtni <code>repo</code> → Generate.<br><br>
-      Token začíná <code>ghp_</code> — ulož si ho, zobrazí se jen jednou.
-    </p>
-  </div>
+  <div style="height: 40px;"></div>
 </div>
 
 <script>
 const GITHUB_USER = "Geomagl";
 const GITHUB_REPO = "herna-tv";
-const STREAM_FILE = "stream.json";
-const LABELS_FILE = "labels.json";
+
+const defaultSchedule = [
+  {type:"nastup",start:"08:57",end:"09:00"},
+  {type:"hra",   start:"09:00",end:"09:25"},
+  {type:"nastup",start:"09:25",end:"09:28"},
+  {type:"hra",   start:"09:28",end:"09:53"},
+  {type:"nastup",start:"09:53",end:"09:56"},
+  {type:"hra",   start:"09:56",end:"10:21"},
+  {type:"nastup",start:"10:21",end:"10:24"},
+  {type:"hra",   start:"10:24",end:"10:49"},
+  {type:"nastup",start:"10:49",end:"10:52"},
+  {type:"hra",   start:"10:52",end:"11:17"},
+  {type:"nastup",start:"11:17",end:"11:20"},
+  {type:"hra",   start:"11:20",end:"11:45"},
+  {type:"nastup",start:"11:45",end:"11:48"},
+  {type:"hra",   start:"11:48",end:"12:13"},
+  {type:"nastup",start:"12:13",end:"12:16"},
+  {type:"hra",   start:"12:16",end:"12:41"},
+  {type:"pauza", start:"12:41",end:"12:53"},
+  {type:"nastup",start:"12:53",end:"12:56"},
+  {type:"hra",   start:"12:56",end:"13:21"},
+  {type:"nastup",start:"13:21",end:"13:24"},
+  {type:"hra",   start:"13:24",end:"13:49"},
+  {type:"nastup",start:"13:49",end:"13:52"},
+  {type:"hra",   start:"13:52",end:"14:17"},
+  {type:"nastup",start:"14:17",end:"14:20"},
+  {type:"hra",   start:"14:20",end:"14:45"},
+  {type:"nastup",start:"14:45",end:"14:48"},
+  {type:"hra",   start:"14:48",end:"15:13"},
+  {type:"nastup",start:"15:13",end:"15:16"},
+  {type:"hra",   start:"15:16",end:"15:41"},
+  {type:"nastup",start:"15:41",end:"15:44"},
+  {type:"hra",   start:"15:44",end:"16:09"},
+  {type:"nastup",start:"16:09",end:"16:12"},
+  {type:"hra",   start:"16:12",end:"16:37"},
+  {type:"nastup",start:"16:37",end:"16:40"},
+  {type:"hra",   start:"16:40",end:"17:05"},
+];
+
+// Working copy
+let slots = defaultSchedule.map(s=>({...s, name:""}));
 
 function extractVideoId(url){
-  const patterns=[
+  const p=[
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
     /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
   ];
-  for(const p of patterns){const m=(url||"").match(p);if(m)return m[1];}
+  for(const r of p){const m=(url||"").match(r);if(m)return m[1];}
   return null;
 }
 
@@ -189,12 +234,98 @@ function setStatus(msg,type){
   el.textContent=msg; el.className="status "+type;
 }
 
+/* ── Build schedule table ── */
+function buildTable(){
+  const tbody=document.getElementById("sched-body");
+  tbody.innerHTML="";
+  slots.forEach((slot,i)=>{
+    const tr=document.createElement("tr");
+    tr.className="sched-row";
+    const badgeClass=slot.type==="hra"?"badge-hra":slot.type==="nastup"?"badge-nastup":"badge-pauza";
+    const typeLabel=slot.type==="hra"?"Hra":slot.type==="nastup"?"Nástup":"Přestávka";
+
+    let nameCell="";
+    if(slot.type==="hra"){
+      nameCell=`<input class="name-input" data-i="${i}" placeholder="Jméno hráče" value="${slot.name||""}" oninput="onNameChange(${i},this.value)">`;
+    } else if(slot.type==="nastup"){
+      // Warm-up gets name from next hra
+      const nextHra=slots.slice(i+1).find(s=>s.type==="hra");
+      const autoName=nextHra?nextHra.name:"";
+      nameCell=`<input class="name-input nastup-auto" data-i="${i}" placeholder="← z Match" value="${autoName}" readonly title="Přebírá jméno z následující hry">`;
+    } else {
+      nameCell=`<span style="color:#444;font-size:13px">—</span>`;
+    }
+
+    tr.innerHTML=`
+      <td><span class="type-badge ${badgeClass}">${typeLabel}</span></td>
+      <td><input type="time" class="time-start" data-i="${i}" value="${slot.start}" oninput="slots[${i}].start=this.value"></td>
+      <td><input type="time" class="time-end"   data-i="${i}" value="${slot.end}"   oninput="slots[${i}].end=this.value"></td>
+      <td>${nameCell}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function onNameChange(i, val){
+  slots[i].name=val;
+  // Update all nastup rows that precede a hra — refresh their auto fields
+  refreshNastupNames();
+}
+
+function refreshNastupNames(){
+  document.querySelectorAll(".nastup-auto").forEach(inp=>{
+    const i=parseInt(inp.dataset.i);
+    const nextHra=slots.slice(i+1).find(s=>s.type==="hra");
+    inp.value=nextHra?nextHra.name:"";
+  });
+}
+
+/* ── Parse paste from Sheets ── */
+function parsePaste(){
+  const raw=document.getElementById("paste-area").value.trim();
+  if(!raw){alert("Nejdříve vlož data ze Sheets.");return;}
+
+  const lines=raw.split("\n").map(l=>l.trim()).filter(Boolean);
+  // Each line: "HH:MM - HH:MM\tJméno"  or just "Jméno" per row
+  // Try to match time range + name
+  const timeRangeRe=/(\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})\s*\t(.+)/;
+  const nameOnlyRe=/^[^\d\t]+$/;
+
+  let matched=0;
+  lines.forEach(line=>{
+    const m=line.match(timeRangeRe);
+    if(m){
+      const start=m[1].padStart(5,"0");
+      const name=m[3].trim();
+      // Find hra slot matching this start time
+      const slot=slots.find(s=>s.type==="hra"&&s.start===start);
+      if(slot){slot.name=name;matched++;}
+    }
+  });
+
+  if(matched>0){
+    buildTable();
+    document.getElementById("paste-area").value="";
+    setStatus(`✓ Načteno ${matched} jmen z Google Sheets.`,"ok");
+  } else {
+    setStatus("Nepodařilo se načíst jména — zkontroluj formát dat ze Sheets.","error");
+  }
+}
+
+// Also auto-parse on paste event
+document.addEventListener("DOMContentLoaded",()=>{
+  document.getElementById("paste-area").addEventListener("paste",()=>{
+    setTimeout(parsePaste,50);
+  });
+});
+
+/* ── GitHub helpers ── */
 async function ghPut(file, content, token, message){
   const apiUrl=`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${file}`;
   let sha=null;
   const getRes=await fetch(apiUrl,{headers:{"Authorization":"token "+token,"Accept":"application/vnd.github+json"}});
   if(getRes.ok){const d=await getRes.json();sha=d.sha;}
-  const body={message, content:btoa(unescape(encodeURIComponent(content)))};
+  const body={message,content:btoa(unescape(encodeURIComponent(content)))};
   if(sha) body.sha=sha;
   const putRes=await fetch(apiUrl,{
     method:"PUT",
@@ -204,6 +335,7 @@ async function ghPut(file, content, token, message){
   return putRes.ok;
 }
 
+/* ── Save all ── */
 async function saveAll(){
   const token=document.getElementById("token").value.trim();
   const url  =document.getElementById("yturl").value.trim();
@@ -217,66 +349,80 @@ async function saveAll(){
   setStatus("Ukládám...","loading");
 
   const labels={
-    hra:    document.getElementById("label-hra").value.trim()    || "Hra",
-    nastup: document.getElementById("label-nastup").value.trim() || "Nástup",
-    pauza:  document.getElementById("label-pauza").value.trim()  || "Technická pauza",
-    konec:  document.getElementById("label-konec").value.trim()  || "Rozvrh dokončen",
+    hra:    document.getElementById("label-hra").value.trim()    ||"Match",
+    nastup: document.getElementById("label-nastup").value.trim() ||"Warm-up",
+    pauza:  document.getElementById("label-pauza").value.trim()  ||"Break",
+    konec:  document.getElementById("label-konec").value.trim()  ||"Session complete",
   };
 
-  const [ok1,ok2]=await Promise.all([
-    ghPut(STREAM_FILE, JSON.stringify({url, updated:new Date().toISOString()}), token, "Update stream"),
-    ghPut(LABELS_FILE, JSON.stringify(labels), token, "Update labels"),
+  // Build schedule with names — nastup inherits from next hra
+  const scheduleOut=slots.map((slot,i)=>{
+    let name=slot.name||"";
+    if(slot.type==="nastup"){
+      const nextHra=slots.slice(i+1).find(s=>s.type==="hra");
+      name=nextHra?nextHra.name:"";
+    }
+    return {type:slot.type, start:slot.start, end:slot.end, name};
+  });
+
+  const [ok1,ok2,ok3]=await Promise.all([
+    ghPut("stream.json",   JSON.stringify({url, updated:new Date().toISOString()}),   token,"Update stream"),
+    ghPut("labels.json",   JSON.stringify(labels),                                     token,"Update labels"),
+    ghPut("schedule.json", JSON.stringify(scheduleOut),                                token,"Update schedule"),
   ]);
 
-  if(ok1&&ok2){
+  if(ok1&&ok2&&ok3){
     setStatus("✓ Uloženo! TV se aktualizuje do 60 sekund.","ok");
     localStorage.setItem("gh_token",token);
-    loadCurrent();
   } else {
-    setStatus("Chyba při ukládání — zkontroluj token a připojení.","error");
+    setStatus("Chyba při ukládání — zkontroluj token.","error");
   }
   btn.disabled=false;
 }
 
-async function loadCurrent(){
-  const el   =document.getElementById("current-url");
-  const thumb=document.getElementById("preview-thumb");
-  const img  =document.getElementById("preview-img");
+/* ── Load existing data ── */
+async function loadExisting(){
+  const nc=Date.now();
   try{
-    const res=await fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${STREAM_FILE}?nocache=${Date.now()}`);
-    if(!res.ok){el.textContent="Žádný stream není nastaven.";return;}
-    const data=await res.json();
-    el.textContent=data.url||"—";
-    const vid=extractVideoId(data.url||"");
-    if(vid){img.src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;thumb.style.display="block";}
-  }catch(e){el.textContent="Nepodařilo se načíst.";}
+    const [sRes,lRes,scRes]=await Promise.all([
+      fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/stream.json?nocache=${nc}`),
+      fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/labels.json?nocache=${nc}`),
+      fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/schedule.json?nocache=${nc}`),
+    ]);
+    if(sRes.ok){
+      const d=await sRes.json();
+      if(d.url) document.getElementById("yturl").value=d.url;
+      const vid=extractVideoId(d.url||"");
+      if(vid){document.getElementById("preview-img").src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;document.getElementById("preview-thumb").style.display="block";}
+      document.getElementById("current-url").textContent=d.url||"";
+    }
+    if(lRes.ok){
+      const d=await lRes.json();
+      if(d.hra)    document.getElementById("label-hra").value   =d.hra;
+      if(d.nastup) document.getElementById("label-nastup").value=d.nastup;
+      if(d.pauza)  document.getElementById("label-pauza").value =d.pauza;
+      if(d.konec)  document.getElementById("label-konec").value =d.konec;
+    }
+    if(scRes.ok){
+      const d=await scRes.json();
+      if(Array.isArray(d)&&d.length>0){
+        slots=d.map(s=>({type:s.type,start:s.start,end:s.end,name:s.name||""}));
+      }
+    }
+  }catch(e){}
+  buildTable();
 }
 
-async function loadLabels(){
-  try{
-    const res=await fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${LABELS_FILE}?nocache=${Date.now()}`);
-    if(!res.ok) return;
-    const d=await res.json();
-    if(d.hra)    document.getElementById("label-hra").value    =d.hra;
-    if(d.nastup) document.getElementById("label-nastup").value =d.nastup;
-    if(d.pauza)  document.getElementById("label-pauza").value  =d.pauza;
-    if(d.konec)  document.getElementById("label-konec").value  =d.konec;
-  }catch(e){}
-}
+document.getElementById("yturl").addEventListener("input",function(){
+  const vid=extractVideoId(this.value);
+  if(vid){document.getElementById("preview-img").src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;document.getElementById("preview-thumb").style.display="block";}
+  else   {document.getElementById("preview-thumb").style.display="none";}
+});
 
 const saved=localStorage.getItem("gh_token");
 if(saved) document.getElementById("token").value=saved;
 
-document.getElementById("yturl").addEventListener("input",function(){
-  const vid=extractVideoId(this.value);
-  const thumb=document.getElementById("preview-thumb");
-  const img  =document.getElementById("preview-img");
-  if(vid){img.src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;thumb.style.display="block";}
-  else   {thumb.style.display="none";}
-});
-
-loadCurrent();
-loadLabels();
+loadExisting();
 </script>
 </body>
 </html>
