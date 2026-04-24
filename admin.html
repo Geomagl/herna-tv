@@ -18,7 +18,6 @@
     justify-content: center;
     padding: 24px;
   }
-
   .card {
     background: #111;
     border: 1px solid #222;
@@ -27,20 +26,9 @@
     width: 100%;
     max-width: 560px;
   }
-
-  .logo {
-    font-size: 13px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: #555;
-    margin-bottom: 8px;
-  }
-  h1 {
-    font-size: 28px;
-    font-weight: 500;
-    color: #fff;
-    margin-bottom: 36px;
-  }
+  .logo { font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #555; margin-bottom: 8px; }
+  h1   { font-size: 28px; font-weight: 500; color: #fff; margin-bottom: 36px; }
+  h2   { font-size: 16px; font-weight: 500; color: #aaa; margin-bottom: 20px; margin-top: 36px; padding-top: 36px; border-top: 1px solid #1c1c1c; }
 
   label {
     display: block;
@@ -50,7 +38,6 @@
     color: #666;
     margin-bottom: 8px;
   }
-
   input[type="text"], input[type="password"] {
     width: 100%;
     background: #1a1a1a;
@@ -66,6 +53,26 @@
   }
   input:focus { border-color: #555; }
 
+  .label-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .label-row .field { display: flex; flex-direction: column; }
+  .label-row input  { margin-bottom: 0; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    width: fit-content;
+  }
+  .badge-hra    { background: #071a04; color: #a3e635; border: 1px solid #a3e635; }
+  .badge-nastup { background: #1f1200; color: #ff9800; border: 1px solid #ff9800; }
+  .badge-pauza  { background: #0d0d1f; color: #7c7cff; border: 1px solid #7c7cff; }
+  .badge-konec  { background: #1a1a1a; color: #888;    border: 1px solid #444; }
+
   .btn {
     width: 100%;
     background: #a3e635;
@@ -80,8 +87,8 @@
     transition: background 0.2s, transform 0.1s;
     margin-top: 4px;
   }
-  .btn:hover  { background: #bef264; }
-  .btn:active { transform: scale(0.98); }
+  .btn:hover   { background: #bef264; }
+  .btn:active  { transform: scale(0.98); }
   .btn:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; transform: none; }
 
   .status {
@@ -91,40 +98,23 @@
     font-size: 14px;
     display: none;
   }
-  .status.ok    { background: #071a04; border: 1px solid #a3e635; color: #a3e635; display: block; }
-  .status.error { background: #1f0000; border: 1px solid #ff4444; color: #ff6666; display: block; }
-  .status.loading { background: #111; border: 1px solid #333; color: #888; display: block; }
+  .status.ok      { background: #071a04; border: 1px solid #a3e635; color: #a3e635; display: block; }
+  .status.error   { background: #1f0000; border: 1px solid #ff4444; color: #ff6666; display: block; }
+  .status.loading { background: #111;    border: 1px solid #333;    color: #888;    display: block; }
 
-  .current {
-    margin-top: 28px;
-    padding-top: 28px;
-    border-top: 1px solid #1c1c1c;
-  }
+  .current { margin-top: 28px; padding-top: 28px; border-top: 1px solid #1c1c1c; }
   .current-label { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 8px; }
   .current-url   { font-size: 14px; color: #666; word-break: break-all; min-height: 20px; }
-
-  .preview-thumb {
-    margin-top: 16px;
-    border-radius: 8px;
-    overflow: hidden;
-    display: none;
-  }
+  .preview-thumb { margin-top: 16px; border-radius: 8px; overflow: hidden; display: none; }
   .preview-thumb img { width: 100%; display: block; }
 
-  .help {
-    margin-top: 32px;
-    padding: 16px;
-    background: #0d0d0d;
-    border-radius: 10px;
-    border: 1px solid #1c1c1c;
-  }
+  .help { margin-top: 32px; padding: 16px; background: #0d0d0d; border-radius: 10px; border: 1px solid #1c1c1c; }
   .help-title { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #444; margin-bottom: 10px; }
   .help p { font-size: 13px; color: #555; line-height: 1.7; }
   .help code { background: #1a1a1a; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #888; }
 </style>
 </head>
 <body>
-
 <div class="card">
   <div class="logo">Herna TV</div>
   <h1>Admin panel</h1>
@@ -133,10 +123,32 @@
   <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
 
   <label for="yturl">YouTube Live odkaz</label>
-  <input type="text"     id="yturl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+  <input type="text" id="yturl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
 
-  <button class="btn" id="save-btn" onclick="saveStream()">Uložit a spustit na TV</button>
+  <h2>Názvy na TV</h2>
 
+  <div class="label-row">
+    <div class="field">
+      <span class="badge badge-hra">Hra</span>
+      <input type="text" id="label-hra" placeholder="Hra">
+    </div>
+    <div class="field">
+      <span class="badge badge-nastup">Nástup</span>
+      <input type="text" id="label-nastup" placeholder="Nástup">
+    </div>
+  </div>
+  <div class="label-row">
+    <div class="field">
+      <span class="badge badge-pauza">Technická pauza</span>
+      <input type="text" id="label-pauza" placeholder="Technická pauza">
+    </div>
+    <div class="field">
+      <span class="badge badge-konec">Konec</span>
+      <input type="text" id="label-konec" placeholder="Rozvrh dokončen">
+    </div>
+  </div>
+
+  <button class="btn" id="save-btn" onclick="saveAll()">Uložit vše a spustit na TV</button>
   <div class="status" id="status"></div>
 
   <div class="current">
@@ -158,13 +170,10 @@
 </div>
 
 <script>
-/* ══════════════════════════════════════════
-   KONFIGURACE — ZMĚŇ POUZE TOTO
-   ══════════════════════════════════════════ */
-const GITHUB_USER = "Geomagl";
+const GITHUB_USER = "TVUJ_GITHUB_USERNAME";
 const GITHUB_REPO = "herna-tv";
 const STREAM_FILE = "stream.json";
-/* ════════════════════════════════════════ */
+const LABELS_FILE = "labels.json";
 
 function extractVideoId(url){
   const patterns=[
@@ -175,94 +184,99 @@ function extractVideoId(url){
   return null;
 }
 
-function setStatus(msg, type){
+function setStatus(msg,type){
   const el=document.getElementById("status");
-  el.textContent=msg;
-  el.className="status "+type;
+  el.textContent=msg; el.className="status "+type;
 }
 
-async function saveStream(){
-  const token=document.getElementById("token").value.trim();
-  const url=document.getElementById("yturl").value.trim();
-  const btn=document.getElementById("save-btn");
+async function ghPut(file, content, token, message){
+  const apiUrl=`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${file}`;
+  let sha=null;
+  const getRes=await fetch(apiUrl,{headers:{"Authorization":"token "+token,"Accept":"application/vnd.github+json"}});
+  if(getRes.ok){const d=await getRes.json();sha=d.sha;}
+  const body={message, content:btoa(unescape(encodeURIComponent(content)))};
+  if(sha) body.sha=sha;
+  const putRes=await fetch(apiUrl,{
+    method:"PUT",
+    headers:{"Authorization":"token "+token,"Accept":"application/vnd.github+json","Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  });
+  return putRes.ok;
+}
 
-  if(!token){ setStatus("Zadej GitHub token.", "error"); return; }
-  if(!url)  { setStatus("Zadej YouTube odkaz.", "error"); return; }
-  if(!extractVideoId(url)){ setStatus("Odkaz nevypadá jako platný YouTube link.", "error"); return; }
+async function saveAll(){
+  const token=document.getElementById("token").value.trim();
+  const url  =document.getElementById("yturl").value.trim();
+  const btn  =document.getElementById("save-btn");
+
+  if(!token){setStatus("Zadej GitHub token.","error");return;}
+  if(!url)  {setStatus("Zadej YouTube odkaz.","error");return;}
+  if(!extractVideoId(url)){setStatus("Odkaz nevypadá jako platný YouTube link.","error");return;}
 
   btn.disabled=true;
-  setStatus("Ukládám...", "loading");
+  setStatus("Ukládám...","loading");
 
-  const content=btoa(JSON.stringify({url, updated: new Date().toISOString()}));
-  const apiUrl=`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${STREAM_FILE}`;
+  const labels={
+    hra:    document.getElementById("label-hra").value.trim()    || "Hra",
+    nastup: document.getElementById("label-nastup").value.trim() || "Nástup",
+    pauza:  document.getElementById("label-pauza").value.trim()  || "Technická pauza",
+    konec:  document.getElementById("label-konec").value.trim()  || "Rozvrh dokončen",
+  };
 
-  try {
-    // Zjistíme SHA pokud soubor existuje (potřebné pro update)
-    let sha=null;
-    const getRes=await fetch(apiUrl,{headers:{"Authorization":"token "+token,"Accept":"application/vnd.github+json"}});
-    if(getRes.ok){const d=await getRes.json();sha=d.sha;}
+  const [ok1,ok2]=await Promise.all([
+    ghPut(STREAM_FILE, JSON.stringify({url, updated:new Date().toISOString()}), token, "Update stream"),
+    ghPut(LABELS_FILE, JSON.stringify(labels), token, "Update labels"),
+  ]);
 
-    const body={message:"Update stream link",content};
-    if(sha) body.sha=sha;
-
-    const putRes=await fetch(apiUrl,{
-      method:"PUT",
-      headers:{"Authorization":"token "+token,"Accept":"application/vnd.github+json","Content-Type":"application/json"},
-      body:JSON.stringify(body)
-    });
-
-    if(putRes.ok){
-      setStatus("✓ Uloženo! TV se aktualizuje do 60 sekund.", "ok");
-      localStorage.setItem("gh_token", token);
-      loadCurrent();
-    } else {
-      const err=await putRes.json();
-      setStatus("Chyba: "+(err.message||putRes.status), "error");
-    }
-  } catch(e){
-    setStatus("Chyba připojení: "+e.message, "error");
+  if(ok1&&ok2){
+    setStatus("✓ Uloženo! TV se aktualizuje do 60 sekund.","ok");
+    localStorage.setItem("gh_token",token);
+    loadCurrent();
+  } else {
+    setStatus("Chyba při ukládání — zkontroluj token a připojení.","error");
   }
-
   btn.disabled=false;
 }
 
 async function loadCurrent(){
-  const el=document.getElementById("current-url");
+  const el   =document.getElementById("current-url");
   const thumb=document.getElementById("preview-thumb");
-  const img=document.getElementById("preview-img");
-  try {
+  const img  =document.getElementById("preview-img");
+  try{
     const res=await fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${STREAM_FILE}?nocache=${Date.now()}`);
     if(!res.ok){el.textContent="Žádný stream není nastaven.";return;}
     const data=await res.json();
     el.textContent=data.url||"—";
     const vid=extractVideoId(data.url||"");
-    if(vid){
-      img.src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
-      thumb.style.display="block";
-    }
-  } catch(e){
-    el.textContent="Nepodařilo se načíst.";
-  }
+    if(vid){img.src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;thumb.style.display="block";}
+  }catch(e){el.textContent="Nepodařilo se načíst.";}
 }
 
-// Předvyplnění uloženého tokenu
+async function loadLabels(){
+  try{
+    const res=await fetch(`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${LABELS_FILE}?nocache=${Date.now()}`);
+    if(!res.ok) return;
+    const d=await res.json();
+    if(d.hra)    document.getElementById("label-hra").value    =d.hra;
+    if(d.nastup) document.getElementById("label-nastup").value =d.nastup;
+    if(d.pauza)  document.getElementById("label-pauza").value  =d.pauza;
+    if(d.konec)  document.getElementById("label-konec").value  =d.konec;
+  }catch(e){}
+}
+
 const saved=localStorage.getItem("gh_token");
 if(saved) document.getElementById("token").value=saved;
 
-// Náhled thumbnailu při psaní
-document.getElementById("yturl").addEventListener("input", function(){
+document.getElementById("yturl").addEventListener("input",function(){
   const vid=extractVideoId(this.value);
   const thumb=document.getElementById("preview-thumb");
-  const img=document.getElementById("preview-img");
-  if(vid){
-    img.src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
-    thumb.style.display="block";
-  } else {
-    thumb.style.display="none";
-  }
+  const img  =document.getElementById("preview-img");
+  if(vid){img.src=`https://img.youtube.com/vi/${vid}/mqdefault.jpg`;thumb.style.display="block";}
+  else   {thumb.style.display="none";}
 });
 
 loadCurrent();
+loadLabels();
 </script>
 </body>
 </html>
