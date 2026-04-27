@@ -20,8 +20,9 @@
     border-right: 2px solid #EA2B1F;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
     color: #fff;
+    position: relative;
   }
 
   /* Top header bar */
@@ -61,21 +62,16 @@
   }
   .mascot-wrap {
     position: absolute;
-    top: -4px;
-    right: 8px;
-    width: 75px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 5;
+    top: 44px; /* just below red header */
+    right: 0;
+    width: 110px;
+    z-index: 20;
+    pointer-events: none;
   }
   .mascot-img {
-    width: 75px;
+    width: 110px;
     height: auto;
     display: block;
-    object-fit: contain;
-    object-position: top;
-    max-height: 105px;
   }
   .bubble {
     position: absolute;
@@ -331,12 +327,13 @@
     </div>
 
     <div class="clock-block">
-      <div class="mascot-wrap" id="mascot-wrap">
-        <div class="bubble" id="bubble"></div>
-        <img class="mascot-img" src="https://raw.githubusercontent.com/Geomagl/herna-tv/main/UncleGoalieOn.png" alt="">
-      </div>
       <div class="clock-big" id="clock">--:--</div>
       <div class="date-label" id="date-label"></div>
+    </div>
+
+    <div class="mascot-wrap" id="mascot-wrap">
+      <div class="bubble" id="bubble"></div>
+      <img class="mascot-img" src="https://geomagl.github.io/herna-tv/UncleGoalieOn.png" alt="">
     </div>
 
     <div class="main-card" id="main-card">
@@ -345,7 +342,7 @@
       <div class="timer-row">
         <div class="timer-val" id="timer-val">--:--</div>
       </div>
-      <div class="timer-unit">remaining</div>
+      <div class="timer-unit">zbývá</div>
       <div class="progress-bar-bg">
         <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
       </div>
@@ -353,7 +350,7 @@
 
     <div class="divider"></div>
 
-    <div class="next-label">Up next</div>
+    <div class="next-label">Nadcházející</div>
     <div class="next-slots">
       <div class="next-slot" id="next0">
         <div class="ns-type" id="next0-type"></div>
@@ -377,10 +374,10 @@
   <div id="yt-wrap">
     <div id="no-stream">
       <div class="no-stream-icon">PA</div>
-      <div class="no-stream-text">Stream not configured</div>
+      <div class="no-stream-text">Stream není nastaven</div>
     </div>
     <div id="mascot-overlay">
-      <video id="mascot-video" src="https://raw.githubusercontent.com/Geomagl/herna-tv/main/mascot_video.mp4" preload="auto" playsinline></video>
+      <video id="mascot-video" src="https://geomagl.github.io/herna-tv/mascot_video.mp4" preload="auto" playsinline></video>
     </div>
   </div>
 
@@ -428,7 +425,7 @@ let schedule = [
   {type:"hra",start:"16:40",end:"17:05",name:""},
 ];
 
-let labels = {hra:"Match",nastup:"Warm-up",pauza:"Break",konec:"Session Complete"};
+let labels = {hra:"Zápas",nastup:"Nástup",pauza:"Přestávka",konec:"Konec sessiony"};
 
 // Original slot colors
 const colors = {
@@ -494,8 +491,8 @@ function setNextSlot(i,slot,bright){
 function tick(){
   const now=new Date();
   document.getElementById("clock").textContent=pad(now.getHours())+":"+pad(now.getMinutes());
-  const days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const days=["Neděle","Pondělí","Úterý","Středa","Čtvrtek","Pátek","Sobota"];
+  const months=["led","úno","bře","dub","kvě","čvn","čvc","srp","zář","říj","lis","pro"];
   document.getElementById("date-label").textContent=days[now.getDay()]+" · "+now.getDate()+" "+months[now.getMonth()]+" "+now.getFullYear();
 
   const ns=nowSec();
@@ -527,7 +524,7 @@ function tick(){
     progFill.style.width=pct+"%"; progFill.style.background=c.fill;
   } else if(ns<toSec(schedule[0].start)){
     card.style.background="#0a0a0a"; card.style.borderLeftColor="#222";
-    pType.textContent=""; pName.style.color="#333"; pName.textContent="SOON";
+    pType.textContent=""; pName.style.color="#333"; pName.textContent="BRZY";
     timerVal.style.color="#333"; timerVal.textContent="--:--"; progFill.style.width="0%";
   } else {
     card.style.background="#0a0a0a"; card.style.borderLeftColor="#EA2B1F";
@@ -610,7 +607,7 @@ function loadAll(){
     }
   }).catch(()=>{});
   fetch(`${base}/labels.json?nocache=${nc}`).then(r=>r.json()).then(d=>{
-    labels={hra:d.hra||"Match",nastup:d.nastup||"Warm-up",pauza:d.pauza||"Break",konec:d.konec||"Session Complete"};
+    labels={hra:d.hra||"Zápas",nastup:d.nastup||"Nástup",pauza:d.pauza||"Přestávka",konec:d.konec||"Konec sessiony"};
   }).catch(()=>{});
   fetch(`${base}/schedule.json?nocache=${nc}`).then(r=>r.json()).then(d=>{
     if(Array.isArray(d)&&d.length>0) schedule=d;
