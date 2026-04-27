@@ -51,28 +51,31 @@
   .clock-block {
     padding: 16px 16px 0 16px;
     flex-shrink: 0;
+    position: relative;
   }
   .clock-time-row {
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 8px;
   }
   .mascot-wrap {
-    position: relative;
-    flex-shrink: 0;
-    width: 80px;
+    position: absolute;
+    top: -4px;
+    right: 8px;
+    width: 75px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    z-index: 5;
   }
   .mascot-img {
-    width: 80px;
+    width: 75px;
     height: auto;
     display: block;
     object-fit: contain;
     object-position: top;
-    max-height: 110px;
+    max-height: 105px;
   }
   .bubble {
     position: absolute;
@@ -328,16 +331,12 @@
     </div>
 
     <div class="clock-block">
-      <div class="clock-time-row">
-        <div>
-          <div class="clock-big" id="clock">--:--</div>
-          <div class="date-label" id="date-label"></div>
-        </div>
-        <div class="mascot-wrap" id="mascot-wrap">
-          <div class="bubble" id="bubble"></div>
-          <img class="mascot-img" src="https://raw.githubusercontent.com/Geomagl/herna-tv/main/UncleGoalieOn.png" alt="">
-        </div>
+      <div class="mascot-wrap" id="mascot-wrap">
+        <div class="bubble" id="bubble"></div>
+        <img class="mascot-img" src="https://raw.githubusercontent.com/Geomagl/herna-tv/main/UncleGoalieOn.png" alt="">
       </div>
+      <div class="clock-big" id="clock">--:--</div>
+      <div class="date-label" id="date-label"></div>
     </div>
 
     <div class="main-card" id="main-card">
