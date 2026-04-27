@@ -211,6 +211,13 @@
     gap: 2px;
     transition: border-color 0.3s, background 0.3s;
   }
+  @keyframes slotPulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+  .next-slot.urgent {
+    animation: slotPulse 1.2s ease-in-out infinite;
+  }
   .ns-order {
     font-size: 9px;
     letter-spacing: 3px;
@@ -532,6 +539,19 @@ function tick(){
   setNextSlot(0,schedule[nextStart]||null,true);
   setNextSlot(1,schedule[nextStart+1]||null,false);
   setNextSlot(2,schedule[nextStart+2]||null,false);
+
+  // Blikání — pokud do konce aktuálního slotu zbývá méně než 60s
+  const next0el = document.getElementById("next0");
+  if(cur>=0){
+    const secsToEnd = toSec(schedule[cur].end) - ns;
+    if(secsToEnd <= 60 && secsToEnd > 0){
+      next0el.classList.add("urgent");
+    } else {
+      next0el.classList.remove("urgent");
+    }
+  } else {
+    next0el.classList.remove("urgent");
+  }
 
   // Bubble logic — show when match has <= 5min left
   if(cur>=0 && schedule[cur].type==="hra"){
