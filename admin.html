@@ -243,6 +243,14 @@
     </table>
   </div>
 
+  <!-- MESSAGES -->
+  <div class="section">
+    <div class="section-title">Hlášky maskota — posledních 5 minut Matche</div>
+    <p style="font-size:13px;color:#555;margin-bottom:16px;letter-spacing:0.5px">Použij <code style="background:#1a1a1a;padding:2px 6px;color:#888">{name}</code> pro jméno hráče který nastupuje. Každá hláška na samostatném řádku.</p>
+    <div id="messages-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px"></div>
+    <button class="btn btn-sm btn-ghost" onclick="addMessage()" style="margin-top:4px">+ Přidat hlášku</button>
+  </div>
+
   <button class="btn btn-full" id="save-btn" onclick="saveAll()">Save &amp; Push to TV</button>
   <div class="status" id="status"></div>
 
@@ -300,7 +308,31 @@ const defaultSchedule = [
 
 let slots = defaultSchedule.map(s=>({...s,name:""}));
 
-function extractVideoId(url){
+/* ── Messages ── */
+function buildMessages(msgs){
+  const list=document.getElementById("messages-list");
+  list.innerHTML="";
+  msgs.forEach((msg,i)=>{
+    const row=document.createElement("div");
+    row.style.cssText="display:flex;gap:8px;align-items:center";
+    row.innerHTML=`
+      <input type="text" value="${msg.replace(/"/g,'&quot;')}" style="flex:1;margin-bottom:0" oninput="updateMessage(${i},this.value)" placeholder="Hláška...">
+      <button class="btn btn-sm btn-ghost" onclick="removeMessage(${i})" style="flex-shrink:0;padding:10px 12px;font-size:16px;line-height:1">×</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+let currentMessages=[
+  "5 minut do konce! {name}, choď se rozehřát!",
+  "{name}, za 5 minut jdeš! Nesmíš nastoupit pozdě!",
+  "Pozor! {name} nastupuje za chvíli!",
+  "Tick tock... {name} máš 5 minut!"
+];
+
+function updateMessage(i,val){ currentMessages[i]=val; }
+function addMessage(){ currentMessages.push(""); buildMessages(currentMessages); }
+function removeMessage(i){ currentMessages.splice(i,1); buildMessages(currentMessages); }
   const p=[/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/];
   for(const r of p){const m=(url||"").match(r);if(m)return m[1];}
   return null;
@@ -395,8 +427,9 @@ async function saveAll(){
   const ok1=await ghPut("stream.json",  JSON.stringify({url,updated:new Date().toISOString()}),token,"Update stream");
   const ok2=await ghPut("labels.json",  JSON.stringify(labels),token,"Update labels");
   const ok3=await ghPut("schedule.json",JSON.stringify(scheduleOut),token,"Update schedule");
+  const ok4=await ghPut("messages.json",JSON.stringify(currentMessages.filter(m=>m.trim())),token,"Update messages");
 
-  if(ok1&&ok2&&ok3){
+  if(ok1&&ok2&&ok3&&ok4){
     setStatus("✓ Saved. TV updates within 60 seconds.","ok");
     localStorage.setItem("gh_token",token);
   } else {
@@ -409,10 +442,11 @@ async function loadExisting(){
   const nc=Date.now();
   const base=`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main`;
   try{
-    const [sRes,lRes,scRes]=await Promise.all([
+    const [sRes,lRes,scRes,mRes]=await Promise.all([
       fetch(`${base}/stream.json?nocache=${nc}`),
       fetch(`${base}/labels.json?nocache=${nc}`),
       fetch(`${base}/schedule.json?nocache=${nc}`),
+      fetch(`${base}/messages.json?nocache=${nc}`),
     ]);
     if(sRes.ok){
       const d=await sRes.json();
@@ -432,8 +466,13 @@ async function loadExisting(){
       const d=await scRes.json();
       if(Array.isArray(d)&&d.length>0) slots=d.map(s=>({type:s.type,start:s.start,end:s.end,name:s.name||""}));
     }
+    if(mRes.ok){
+      const d=await mRes.json();
+      if(Array.isArray(d)&&d.length>0) currentMessages=d;
+    }
   }catch(e){}
   buildTable();
+  buildMessages(currentMessages);
 }
 
 document.getElementById("yturl").addEventListener("input",function(){
