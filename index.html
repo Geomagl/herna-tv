@@ -20,9 +20,8 @@
     border-right: 2px solid #EA2B1F;
     display: flex;
     flex-direction: column;
-    overflow: visible;
+    overflow: hidden;
     color: #fff;
-    position: relative;
   }
 
   /* Top header bar */
@@ -61,17 +60,20 @@
     gap: 8px;
   }
   .mascot-wrap {
-    position: absolute;
-    top: 44px; /* just below red header */
-    right: 0;
-    width: 110px;
-    z-index: 20;
-    pointer-events: none;
+    flex-shrink: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 0;
+    overflow: hidden;
+    max-height: 140px;
   }
   .mascot-img {
     width: 110px;
-    height: auto;
+    height: 140px;
     display: block;
+    object-fit: cover;
+    object-position: top center;
   }
   .bubble {
     position: absolute;
