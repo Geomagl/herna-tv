@@ -250,6 +250,29 @@
     position: relative;
   }
   #yt-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+
+  /* Mascot video overlay */
+  #mascot-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 55%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    z-index: 10;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+  #mascot-overlay.visible { opacity: 1; }
+  #mascot-overlay video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom right;
+  }
   #no-stream {
     text-align: center;
     color: #222;
@@ -356,6 +379,9 @@
     <div id="no-stream">
       <div class="no-stream-icon">PA</div>
       <div class="no-stream-text">Stream not configured</div>
+    </div>
+    <div id="mascot-overlay">
+      <video id="mascot-video" src="https://raw.githubusercontent.com/Geomagl/herna-tv/main/mascot_video.mp4" preload="auto" playsinline></video>
     </div>
   </div>
 
@@ -593,8 +619,51 @@ function loadAll(){
   }).catch(()=>{});
 }
 
+/* ── Mascot video overlay — every 10min 9:00–16:50 ── */
+const OVERLAY_TIMES = (()=>{
+  const times=[];
+  for(let h=9;h<=16;h++){
+    for(let m=0;m<60;m+=10){
+      if(h===16&&m>50) break;
+      times.push(h*3600+m*60);
+    }
+  }
+  return times; // [32400, 33000, 33600, ...]
+})();
+
+let overlayShownThisMinute = false;
+let lastOverlayMinute = -1;
+
+function checkOverlay(){
+  const ns = nowSec();
+  // Find if current second matches any overlay time (within 5s window)
+  const match = OVERLAY_TIMES.some(t => ns >= t && ns < t+5);
+  const currentMinuteKey = Math.floor(ns/60);
+
+  if(match && currentMinuteKey !== lastOverlayMinute){
+    lastOverlayMinute = currentMinuteKey;
+    playMascotOverlay();
+  }
+}
+
+function playMascotOverlay(){
+  const overlay = document.getElementById("mascot-overlay");
+  const video   = document.getElementById("mascot-video");
+  if(!overlay || !video) return;
+
+  video.currentTime = 0;
+  video.muted = false;
+  overlay.classList.add("visible");
+  video.play().catch(()=>{ video.muted=true; video.play(); });
+
+  video.onended = ()=>{
+    overlay.classList.remove("visible");
+  };
+}
+
 tick();
 setInterval(tick,1000);
+setInterval(checkOverlay,1000);
 loadAll();
 setInterval(loadAll,60000);
 document.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
