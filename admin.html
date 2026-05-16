@@ -161,6 +161,12 @@
   .name-input:focus { border-color: #EA2B1F; border-bottom-color: #EA2B1F; }
   .name-input.auto { color: #444; font-style: italic; }
 
+  .btn-del { background: transparent; border: 1px solid #2a2a2a; color: #444; padding: 6px 10px; font-size: 14px; line-height: 1; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; font-family: 'Barlow', Arial, sans-serif; }
+  .btn-del:hover { background: #1a1a1a; color: #ff5555; border-color: #ff5555; }
+
+  .sched-add-row { border-top: 1px solid #1a1a1a; }
+  .sched-add-row td { padding: 10px 8px; }
+
   .labels-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .label-field { display: flex; flex-direction: column; gap: 8px; }
   .label-field input { margin-bottom: 0; }
@@ -237,6 +243,7 @@
           <th>Start</th>
           <th>End</th>
           <th>Player</th>
+          <th></th>
         </tr>
       </thead>
       <tbody id="sched-body"></tbody>
@@ -341,6 +348,28 @@ function extractVideoId(url){
 }
 function setStatus(msg,type){const el=document.getElementById("status");el.textContent=msg;el.className="status "+type;}
 
+function addMinutes(time,mins){
+  const [h,m]=time.split(":").map(Number);
+  const t=h*60+m+mins;
+  return String(Math.floor(t/60)%24).padStart(2,"0")+":"+String(t%60).padStart(2,"0");
+}
+
+function deleteSlot(i){slots.splice(i,1);buildTable();}
+
+function addMatchPair(){
+  const lastEnd=slots.length>0?slots[slots.length-1].end:"09:00";
+  const hraStart=addMinutes(lastEnd,1);
+  slots.push({type:"nastup",start:lastEnd,end:hraStart,name:""});
+  slots.push({type:"hra",start:hraStart,end:addMinutes(hraStart,25),name:""});
+  buildTable();
+}
+
+function addPauza(){
+  const lastEnd=slots.length>0?slots[slots.length-1].end:"09:00";
+  slots.push({type:"pauza",start:lastEnd,end:addMinutes(lastEnd,15),name:""});
+  buildTable();
+}
+
 function buildTable(){
   const tbody=document.getElementById("sched-body");
   tbody.innerHTML="";
@@ -364,9 +393,22 @@ function buildTable(){
       <td><input type="time" value="${slot.start}" oninput="slots[${i}].start=this.value" style="width:110px"></td>
       <td><input type="time" value="${slot.end}"   oninput="slots[${i}].end=this.value"   style="width:110px"></td>
       <td>${nameCell}</td>
+      <td><button class="btn-del" onclick="deleteSlot(${i})" title="Remove">×</button></td>
     `;
     tbody.appendChild(tr);
   });
+
+  const addRow=document.createElement("tr");
+  addRow.className="sched-add-row";
+  addRow.innerHTML=`
+    <td colspan="5" style="padding:12px 8px 4px">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm btn-ghost" onclick="addMatchPair()">+ Match</button>
+        <button class="btn btn-sm btn-ghost" onclick="addPauza()">+ Pauza</button>
+      </div>
+    </td>
+  `;
+  tbody.appendChild(addRow);
 }
 
 function onNameChange(i,val){slots[i].name=val;refreshAutoNames();}
