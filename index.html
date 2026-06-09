@@ -446,6 +446,9 @@ const dimColors = {
 function toSec(t){const[h,m]=t.split(":").map(Number);return h*3600+m*60;}
 function nowSec(){const n=new Date();return n.getHours()*3600+n.getMinutes()*60+n.getSeconds();}
 function pad(n){return String(n).padStart(2,"0");}
+function slotActive(slot,ns){const ss=toSec(slot.start),es=toSec(slot.end);return es<ss?(ns>=ss||ns<es):(ns>=ss&&ns<es);}
+function slotTotalSecs(slot){const ss=toSec(slot.start),es=toSec(slot.end);return es<ss?86400-ss+es:es-ss;}
+function slotSecsLeft(slot,ns){const ss=toSec(slot.start),es=toSec(slot.end);return es<ss?(ns>=ss?86400-ns+es:es-ns):es-ns;}
 
 function getColor(slot,secsLeft,totalSecs){
   if(slot.type==="nastup"){
@@ -502,7 +505,7 @@ function tick(){
   const ns=nowSec();
   let cur=-1;
   for(let i=0;i<schedule.length;i++){
-    if(ns>=toSec(schedule[i].start)&&ns<toSec(schedule[i].end)){cur=i;break;}
+    if(slotActive(schedule[i],ns)){cur=i;break;}
   }
 
   const card=document.getElementById("main-card");
@@ -514,9 +517,10 @@ function tick(){
 
   if(cur>=0){
     const slot=schedule[cur];
-    const endS=toSec(slot.end),startS=toSec(slot.start);
-    const totalSecs=endS-startS,secsLeft=endS-ns;
-    const pct=Math.min(100,((ns-startS)/totalSecs)*100);
+    const totalSecs=slotTotalSecs(slot),secsLeft=slotSecsLeft(slot,ns);
+    const startS=toSec(slot.start);
+    const elapsed=ns>=startS?ns-startS:86400-startS+ns;
+    const pct=Math.min(100,(elapsed/totalSecs)*100);
     const c=getColor(slot,secsLeft,totalSecs);
     card.style.background=c.bg; card.style.borderLeftColor=c.border;
     pType.style.color=c.text; pName.style.color=c.text;
@@ -543,7 +547,7 @@ function tick(){
   // Blikání — pokud do konce aktuálního slotu zbývá méně než 60s
   const next0el = document.getElementById("next0");
   if(cur>=0){
-    const secsToEnd = toSec(schedule[cur].end) - ns;
+    const secsToEnd = slotSecsLeft(schedule[cur],ns);
     if(secsToEnd <= 60 && secsToEnd > 0){
       next0el.classList.add("urgent");
     } else {
@@ -555,7 +559,7 @@ function tick(){
 
   // Bubble logic — show when match has <= 5min left
   if(cur>=0 && schedule[cur].type==="hra"){
-    const secsLeft2 = toSec(schedule[cur].end) - ns;
+    const secsLeft2 = slotSecsLeft(schedule[cur],ns);
     if(secsLeft2 <= 300 && secsLeft2 > 0){
       const warmupName = getNextWarmupName(cur);
       startBubble(warmupName);
