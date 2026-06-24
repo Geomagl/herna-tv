@@ -50,10 +50,11 @@ function todayStr() {
   return `${y}-${m}-${day}`;
 }
 
-function scheduleRefreshAtMidnight() {
+function scheduleRefreshAt5am() {
   const now = new Date();
-  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
-  setTimeout(() => location.reload(), midnight - now);
+  let next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 5, 0, 0);
+  if (now >= next) next.setDate(next.getDate() + 1);
+  setTimeout(() => location.reload(), next - now);
 }
 
 async function loadQR() {
@@ -77,7 +78,7 @@ async function loadQR() {
 }
 
 loadQR();
-scheduleRefreshAtMidnight();
+scheduleRefreshAt5am();
 </script>
 </body>
 </html>
