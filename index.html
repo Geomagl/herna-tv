@@ -295,6 +295,31 @@
     text-transform: uppercase;
     color: #2a2a2a;
   }
+
+  /* QR Docházka overlay */
+  #qr-overlay {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 50;
+  }
+  #qr-overlay img {
+    display: block;
+    width: 160px;
+    height: 160px;
+    border-radius: 4px;
+  }
+  #qr-overlay span {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #555;
+  }
 </style>
 </head>
 <body>
@@ -686,6 +711,56 @@ setInterval(checkOverlay,1000);
 loadAll();
 setInterval(loadAll,60000);
 document.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
+</script>
+
+<div id="qr-overlay">
+  <img id="qr-img" src="" alt="QR Docházka"/>
+  <span>Docházka</span>
+</div>
+
+<script>
+(function(){
+  const SB_URL = "https://ltdluiumymxgqhcdsjbg.supabase.co";
+  const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0ZGx1aXVteW14Z3FoY2RzamJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxOTU3NzAsImV4cCI6MjA5Mjc3MTc3MH0._iWumZkcLJzeG6Qzj2I7ezeN-ulBUsyR3Y-O15dM_oY";
+
+  function todayStr(){
+    const d=new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+
+  async function loadQR(){
+    const date=todayStr();
+    try{
+      const res=await fetch(`${SB_URL}/rest/v1/qr_codes?date=eq.${date}&select=code`,
+        {headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}});
+      const data=await res.json();
+      let code=data&&data[0]&&data[0].code;
+      if(!code){
+        const rpc=await fetch(`${SB_URL}/rest/v1/rpc/generate_daily_qr`,
+          {method:"POST",headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,"Content-Type":"application/json"},
+           body:JSON.stringify({p_date:date})});
+        code=await rpc.json();
+      }
+      if(code){
+        document.getElementById("qr-img").src=
+          "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data="+
+          encodeURIComponent(code)+"&bgcolor=ffffff&color=000000&margin=1";
+      }
+    }catch(e){
+      setTimeout(loadQR,60000);
+    }
+  }
+
+  function scheduleRefreshAt5am(){
+    const now=new Date();
+    let next=new Date(now.getFullYear(),now.getMonth(),now.getDate(),5,0,0);
+    if(now>=next) next.setDate(next.getDate()+1);
+    setTimeout(()=>location.reload(),next-now);
+  }
+
+  loadQR();
+  scheduleRefreshAt5am();
+})();
 </script>
 </body>
 </html>
