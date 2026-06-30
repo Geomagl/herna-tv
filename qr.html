@@ -42,14 +42,16 @@
 const SUPABASE_URL = "https://ltdluiumymxgqhcdsjbg.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0ZGx1aXVteW14Z3FoY2RzamJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxOTU3NzAsImV4cCI6MjA5Mjc3MTc3MH0._iWumZkcLJzeG6Qzj2I7ezeN-ulBUsyR3Y-O15dM_oY";
 
-function todayStr() {
+// Před 5:00 ráno vrátí včerejší datum – golmani odcházejí z noční až ráno
+function qrDate() {
   const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  if (d.getHours() < 5) d.setDate(d.getDate() - 1);
+  return d.getFullYear() + "-" +
+    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
 }
 
+// V 5:00 ráno přenačte stránku – přepne na dnešní QR
 function scheduleRefreshAt5am() {
   const now = new Date();
   let next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 5, 0, 0);
@@ -58,7 +60,7 @@ function scheduleRefreshAt5am() {
 }
 
 async function loadQR() {
-  const date = todayStr();
+  const date = qrDate();
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/qr_codes?date=eq.${date}&select=code`,
@@ -73,11 +75,11 @@ async function loadQR() {
     }
   } catch (e) {
     // tiché selhání – zkusí znovu za minutu
-    setTimeout(loadQR, 60000);
   }
 }
 
 loadQR();
+setInterval(loadQR, 60000); // kontrola každou minutu
 scheduleRefreshAt5am();
 </script>
 </body>
