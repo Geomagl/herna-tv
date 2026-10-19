@@ -236,6 +236,12 @@
     </div>
     <button class="btn btn-sm btn-ghost" onclick="parsePaste()" style="margin-bottom:24px">Load names from clipboard</button>
 
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:24px;flex-wrap:wrap">
+      <label for="match-len" style="margin:0">Match length (mm:ss)</label>
+      <input type="text" id="match-len" value="18:45" style="width:90px">
+      <button class="btn btn-sm btn-ghost" onclick="recalcTimes()">Recalculate times</button>
+    </div>
+
     <table class="sched-table">
       <thead>
         <tr>
@@ -313,7 +319,7 @@ const defaultSchedule = [
   {type:"hra",start:"16:40",end:"17:05"},
 ];
 
-let slots = defaultSchedule.map(s=>({...s,name:""}));
+let slots = defaultSchedule.map(s=>({type:s.type,start:s.start+":00",end:s.end+":00",name:""}));
 
 /* ── Messages ── */
 function buildMessages(msgs){
@@ -348,26 +354,55 @@ function extractVideoId(url){
 }
 function setStatus(msg,type){const el=document.getElementById("status");el.textContent=msg;el.className="status "+type;}
 
-function addMinutes(time,mins){
-  const [h,m]=time.split(":").map(Number);
-  const t=h*60+m+mins;
-  return String(Math.floor(t/60)%24).padStart(2,"0")+":"+String(t%60).padStart(2,"0");
+const WARMUP_SECS=60;
+
+function pad2(n){return String(n).padStart(2,"0");}
+function toSec(t){const[h,m,s]=(t||"00:00").split(":").map(Number);return h*3600+m*60+(s||0);}
+function fromSec(t){t=((t%86400)+86400)%86400;return pad2(Math.floor(t/3600))+":"+pad2(Math.floor(t/60)%60)+":"+pad2(t%60);}
+function normTime(t){return fromSec(toSec(t));}
+function addSeconds(time,secs){return fromSec(toSec(time)+secs);}
+function durSecs(slot){const d=toSec(slot.end)-toSec(slot.start);return d<0?d+86400:d;}
+
+function getMatchSecs(){
+  const v=document.getElementById("match-len").value.trim();
+  const [m,s]=v.split(":").map(Number);
+  if(isNaN(m)||(s!==undefined&&(isNaN(s)||s>59))) return null;
+  return m*60+(s||0);
 }
 
 function deleteSlot(i){slots.splice(i,1);buildTable();}
 
 function addMatchPair(){
-  const lastEnd=slots.length>0?slots[slots.length-1].end:"09:00";
-  const hraStart=addMinutes(lastEnd,1);
+  const matchSecs=getMatchSecs();
+  if(!matchSecs){setStatus("Invalid Match length (use mm:ss).","error");return;}
+  const lastEnd=slots.length>0?slots[slots.length-1].end:"09:00:00";
+  const hraStart=addSeconds(lastEnd,WARMUP_SECS);
   slots.push({type:"nastup",start:lastEnd,end:hraStart,name:""});
-  slots.push({type:"hra",start:hraStart,end:addMinutes(hraStart,25),name:""});
+  slots.push({type:"hra",start:hraStart,end:addSeconds(hraStart,matchSecs),name:""});
   buildTable();
 }
 
 function addPauza(){
-  const lastEnd=slots.length>0?slots[slots.length-1].end:"09:00";
-  slots.push({type:"pauza",start:lastEnd,end:addMinutes(lastEnd,15),name:""});
+  const lastEnd=slots.length>0?slots[slots.length-1].end:"09:00:00";
+  slots.push({type:"pauza",start:lastEnd,end:addSeconds(lastEnd,15*60),name:""});
   buildTable();
+}
+
+/* Sets every Match to the chosen length and shifts all following slots;
+   Warm-up and Break slots keep their own durations. */
+function recalcTimes(){
+  const matchSecs=getMatchSecs();
+  if(!matchSecs){setStatus("Invalid Match length (use mm:ss).","error");return;}
+  if(!slots.length) return;
+  let t=toSec(slots[0].start);
+  slots.forEach(slot=>{
+    const d=slot.type==="hra"?matchSecs:durSecs(slot);
+    slot.start=fromSec(t);
+    slot.end=fromSec(t+d);
+    t+=d;
+  });
+  buildTable();
+  setStatus("✓ Times recalculated — don't forget to Save.","ok");
 }
 
 function buildTable(){
@@ -390,8 +425,8 @@ function buildTable(){
     }
     tr.innerHTML=`
       <td><span class="type-tag ${tagClass}">${typeLabel}</span></td>
-      <td><input type="time" value="${slot.start}" oninput="slots[${i}].start=this.value" style="width:110px"></td>
-      <td><input type="time" value="${slot.end}"   oninput="slots[${i}].end=this.value"   style="width:110px"></td>
+      <td><input type="time" step="1" value="${slot.start}" oninput="slots[${i}].start=normTime(this.value)" style="width:140px"></td>
+      <td><input type="time" step="1" value="${slot.end}"   oninput="slots[${i}].end=normTime(this.value)"   style="width:140px"></td>
       <td>${nameCell}</td>
       <td><button class="btn-del" onclick="deleteSlot(${i})" title="Remove">×</button></td>
     `;
@@ -508,7 +543,7 @@ async function loadExisting(){
     }
     if(scRes.ok){
       const d=await scRes.json();
-      if(Array.isArray(d)&&d.length>0) slots=d.map(s=>({type:s.type,start:s.start,end:s.end,name:s.name||""}));
+      if(Array.isArray(d)&&d.length>0) slots=d.map(s=>({type:s.type,start:normTime(s.start),end:normTime(s.end),name:s.name||""}));
     }
     if(mRes.ok){
       const d=await mRes.json();

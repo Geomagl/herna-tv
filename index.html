@@ -457,7 +457,8 @@ const dimColors = {
   pauza: {bg:"#0a0a1a", border:"#3a3a8a", text:"#6060cc", timeColor:"#4a4aaa"},
 };
 
-function toSec(t){const[h,m]=t.split(":").map(Number);return h*3600+m*60;}
+function toSec(t){const[h,m,s]=t.split(":").map(Number);return h*3600+m*60+(s||0);}
+function fmtTime(t){const p=t.split(":");return p[2]&&p[2]!=="00"?t:p[0]+":"+p[1];}
 function nowSec(){const n=new Date();return n.getHours()*3600+n.getMinutes()*60+n.getSeconds();}
 function pad(n){return String(n).padStart(2,"0");}
 function slotActive(slot,ns){const ss=toSec(slot.start),es=toSec(slot.end);return es<ss?(ns>=ss||ns<es):(ns>=ss&&ns<es);}
@@ -501,7 +502,7 @@ function setNextSlot(i,slot,bright){
     }
     if(hasName){tp.textContent=slotTypeName(slot);nm.textContent=slot.name.toUpperCase();}
     else{tp.textContent="";nm.textContent=slotTypeName(slot).toUpperCase();}
-    tm.textContent=slot.start+" – "+slot.end;
+    tm.textContent=fmtTime(slot.start)+" – "+fmtTime(slot.end);
   } else {
     el.style.borderLeftColor="#1a1a1a";
     el.style.background="transparent";
